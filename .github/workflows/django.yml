@@ -27,5 +27,5 @@ jobs:
         pip install -r requirements.txt
     - name: Run Tests
       run: |
-        cd SciBind
+        cd backend/SciBind
         python manage.py test
