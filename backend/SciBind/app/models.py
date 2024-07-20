@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from helpers import document
+from .helpers import document
 # Create your models here.
 class User(AbstractUser):
     chosen_events = models.ManyToManyField('Event', related_name='owners')
