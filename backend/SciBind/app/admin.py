@@ -1,7 +1,7 @@
 from django.contrib import admin
-from .models import User, Event, Binder
+from .models import User, EventModel, BinderModel
 
 # Register your models here.
 admin.site.register(User)
-admin.site.register(Event)
-admin.site.register(Binder)
+admin.site.register(EventModel)
+admin.site.register(BinderModel)

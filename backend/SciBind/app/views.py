@@ -1,5 +1,5 @@
 from rest_framework import viewsets
-from .models import Binder, Event, User
+from .models import BinderModel, EventModel, User
 from .serializers import BinderSerializer, EventSerializer
 from rest_framework.response import Response
 from django.views import View
@@ -21,13 +21,13 @@ class Binders(viewsets.ModelViewSet):
     Returns:
         Response: A response containing data of all binders serialized.
     """
-    model = Binder
+    model = BinderModel
     serializer_class = BinderSerializer
-    queryset = Binder.objects.all()
+    queryset = BinderModel.objects.all()
     def list(self, request):
         # Get user from request in context of rest_framework
         user = request.user
-        queryset = Binder.objects.all(owner=user)
+        queryset = BinderModel.objects.all(owner=user)
         serializer = BinderSerializer(queryset, many=True)
         return Response(serializer.data)
 
@@ -41,11 +41,11 @@ class Events(viewsets.ModelViewSet):
     Returns:
         Response: A response containing data of all events serialized.
     """
-    model = Event
+    model = EventModel
     serializer_class = EventSerializer
-    queryset = Event.objects.all()
+    queryset = EventModel.objects.all()
     def list(self, _):
-        queryset = Event.objects.all()
+        queryset = EventModel.objects.all()
         serializer = EventSerializer(queryset, many=True)
         return Response(serializer.data)
 

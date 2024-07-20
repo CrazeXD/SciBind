@@ -1,12 +1,12 @@
 from rest_framework import serializers
-from .models import Binder, Event
+from .models import BinderModel, EventModel
 
 class BinderSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Binder
+        model = BinderModel
         fields = '__all__'
 
 class EventSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Event
+        model = EventModel
         fields = '__all__'
