@@ -18,3 +18,7 @@ class Event(models.Model):
 class Binder(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    file = models.FileField(upload_to='binders/')
+    date = models.DateField(auto_now_add=True)
+    shared_with = models.ManyToManyField(User, related_name='shared_binders')
+    

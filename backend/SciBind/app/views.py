@@ -25,7 +25,9 @@ class Binders(viewsets.ModelViewSet):
     serializer_class = BinderSerializer
     queryset = Binder.objects.all()
     def list(self, request):
-        queryset = Binder.objects.all()
+        # Get user from request in context of rest_framework
+        user = request.user
+        queryset = Binder.objects.all(owner=user)
         serializer = BinderSerializer(queryset, many=True)
         return Response(serializer.data)
 
@@ -42,7 +44,7 @@ class Events(viewsets.ModelViewSet):
     model = Event
     serializer_class = EventSerializer
     queryset = Event.objects.all()
-    def list(self, request):
+    def list(self, _):
         queryset = Event.objects.all()
         serializer = EventSerializer(queryset, many=True)
         return Response(serializer.data)
