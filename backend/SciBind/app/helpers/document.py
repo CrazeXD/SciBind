@@ -2,32 +2,42 @@ import uuid
 from typing import List, Dict, Any
 
 class Element:
-    def __init__(self, element_type: str, content: Any, level: int = 0):
+    def __init__(self, element_type: str, content: Any):
         self.id = str(uuid.uuid4())
         self.type = element_type
         self.content = content
-        self.level: int = level
         self.styling: Dict[str, Any] = {
             "bold": False,
             "italic": False,
             "underline": False,
-            "color": None,
+            "color": "black",
+            "alignment": "left",
+            "font": "Arial",
+            "size": 12,
+            "highlight": "none",
+            "bullet": False, # Could be an integer to represent the level of indentation
+            "number": False, # Could be an integer to represent the level of indentation
+            "indent": 0 # Could be an integer to represent the level of indentation
         }
-
+        
+    def modify_styling(self, styling: Dict[str, Any]):
+        self.styling.update(styling)
+    
     def to_dict(self) -> Dict[str, Any]:
         return {
             "id": self.id,
             "type": self.type,
-            "content": self.content
+            "content": self.content,
+            "styling": self.styling
         }
 
 class Equation(Element):
-    def __init__(self, content: str, level: int = 0):
-        super().__init__("equation", content, level = level)
+    def __init__(self, content: str):
+        super().__init__("equation", content)
     
 class Hyperlink(Element):
-    def __init__(self, content: str, level: int = 0, url = None):
-        super().__init__("hyperlink", content, level = level)
+    def __init__(self, content: str, url = None):
+        super().__init__("hyperlink", content)
         if type(url) == str:
             self.url = url
         elif url.issubclass(Element):
@@ -74,26 +84,9 @@ class Document:
             "version": self.version,
             "sections": [section.to_dict() for section in self.sections]
         }
-
-    def update_version(self):
-        self.version += 1
-
-# Example usage
-if __name__ == "__main__":
-    # Create a document
-    doc = Document("Physics Cheat Sheet")
-
-    # Create a section
-    mechanics_section = Section("Classical Mechanics")
-
-    # Add elements to the section
-    mechanics_section.add_element(Element("text", "Newton's Laws of Motion:"))
-    mechanics_section.add_element(Element("formula", "F = ma"))
-    mechanics_section.add_element(Element("text", "1. An object at rest stays at rest, and an object in motion stays in motion..."))
-
-    # Add the section to the document
-    doc.add_section(mechanics_section)
-
-    # Print the document structure
-    import json
-    print(json.dumps(doc.to_dict(), indent=2))
+    
+    def get_version(self) -> int:
+        return self.version
+      
+    def update_version(self, amount: int = 1):
+        self.version += amount

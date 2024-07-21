@@ -103,4 +103,3 @@ def logout(request):
     """
     request.user.auth_token.delete()
     return Response({'message': 'Successfully logged out'})
-    
