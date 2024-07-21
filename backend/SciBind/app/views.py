@@ -12,6 +12,7 @@ from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 
 from django.contrib.auth import authenticate
+from django.views.decorators.csrf import csrf_exempt
 
 class Binders(viewsets.ModelViewSet):
     """
@@ -50,7 +51,7 @@ class Events(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-
+@csrf_exempt
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])
 def login(request):
@@ -70,6 +71,7 @@ def login(request):
         return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
     token, _ = Token.objects.get_or_create(user=user)
     return Response({'token': token.key})
+
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])
 def register(request):
