@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function Dashboard() {
-  const [profilePicture, setProfilePicture] = useState("");
+  const [profilePicture, setProfilePicture] = useState<File[]>([]);
+  const [isImageLoading, setImageLoading] = useState(true);
+
   useEffect(() => {
     fetch("http://127.0.0.1:8000/api/picture/", {
       headers: {
@@ -13,8 +14,8 @@ export default function Dashboard() {
     })
       .then((response) => {
         if (response.ok) {
-          response.json().then((data) => {
-            setProfilePicture(data);
+          response.blob().then((data) => {
+            return setProfilePicture([new File([data], "profile_picture.jpg")]);
           });
         } else {
           throw new Error("An error occurred");
@@ -23,8 +24,8 @@ export default function Dashboard() {
       .catch((error) => {
         console.error(error);
       });
-    })
-  
+  }, []);
+
   return (
     <div className="navbar bg-base-100">
       <div className="flex-1">
@@ -44,11 +45,25 @@ export default function Dashboard() {
             role="button"
             className="btn btn-ghost btn-circle avatar"
           >
-            <div className="w-10 rounded-full">
-              <img
-                alt="Profile Picture"
-                src={profilePicture}
-              />
+            <div className="w-10 h-10 rounded-full overflow-hidden flex justify-center items-center">
+              {profilePicture.length > 0 ? (
+                <img
+                  alt="Profile Picture"
+                  src={URL.createObjectURL(profilePicture[0])}
+                  onLoad={() => setImageLoading(false)}
+                  style={{
+                    display: isImageLoading ? "none" : "block",
+                    width: "auto", // Adjust if necessary to ensure the image covers the circle
+                    height: "100%", // Adjust height to fill the container
+                    objectFit: "cover",
+                    borderRadius: "50%",
+                  }}
+                />
+              ) : (
+                <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
+                  <span className="text-sm"></span>
+                </div>
+              )}
             </div>
           </div>
           <ul
