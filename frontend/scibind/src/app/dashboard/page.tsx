@@ -4,6 +4,27 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function Dashboard() {
+  const [profilePicture, setProfilePicture] = useState("");
+  useEffect(() => {
+    fetch("http://127.0.0.1:8000/api/picture/", {
+      headers: {
+        Authorization: `Token ${localStorage.getItem("token")}`,
+      },
+    })
+      .then((response) => {
+        if (response.ok) {
+          response.json().then((data) => {
+            setProfilePicture(data);
+          });
+        } else {
+          throw new Error("An error occurred");
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+    })
+  
   return (
     <div className="navbar bg-base-100">
       <div className="flex-1">
@@ -25,8 +46,8 @@ export default function Dashboard() {
           >
             <div className="w-10 rounded-full">
               <img
-                alt="Tailwind CSS Navbar component"
-                src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+                alt="Profile Picture"
+                src={profilePicture}
               />
             </div>
           </div>

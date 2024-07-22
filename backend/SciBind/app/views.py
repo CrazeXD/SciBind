@@ -1,3 +1,5 @@
+from django.http import FileResponse
+from django.conf import settings
 from rest_framework import viewsets
 from .models import BinderModel, EventModel, User
 from .serializers import BinderSerializer, EventSerializer
@@ -13,6 +15,8 @@ from rest_framework.authtoken.models import Token
 
 from django.contrib.auth import authenticate
 from django.views.decorators.csrf import csrf_exempt
+
+import os
 
 class Binders(viewsets.ModelViewSet):
     """
@@ -105,3 +109,24 @@ def logout(request):
     """
     request.user.auth_token.delete()
     return Response({'message': 'Successfully logged out'})
+@api_view(['GET'])
+def profile_picture(request):
+    """
+    A view for handling profile picture requests.
+
+    Args:
+        request: The request object.
+
+    Returns:
+        Response: A response containing the user's profile picture.
+    """
+    token = request.headers.get('Authorization').split(' ')[1]
+    user = Token.objects.get(key=token).user
+    if user.profile_picture:
+        file_path = os.path.join(settings.MEDIA_ROOT, str(user.profile_picture))
+        if os.path.exists(file_path):
+            response = FileResponse(open(file_path, 'rb'))
+            response['Content-Disposition'] = (
+                f'inline; filename={os.path.basename(file_path)}'
+            )
+            return response
