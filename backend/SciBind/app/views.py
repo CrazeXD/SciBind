@@ -53,7 +53,7 @@ class Events(viewsets.ModelViewSet):
         serializer = EventSerializer(queryset, many=True)
         return Response(serializer.data)
 
-
+# User views
 @csrf_exempt
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])

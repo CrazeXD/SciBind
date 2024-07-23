@@ -26,10 +26,15 @@ export default function Dashboard() {
       });
   }, []);
 
+  const logout = () => {
+    localStorage.removeItem("token");
+    location.href = "/";
+  };
+
   return (
     <div className="navbar bg-base-100">
       <div className="flex-1">
-        <a className="btn btn-ghost text-xl">SciBind</a>
+        <a className="btn btn-ghost text-2xl">SciBind</a>
       </div>
       <div className="flex-none gap-2">
         <div className="form-control">
@@ -53,8 +58,8 @@ export default function Dashboard() {
                   onLoad={() => setImageLoading(false)}
                   style={{
                     display: isImageLoading ? "none" : "block",
-                    width: "auto", // Adjust if necessary to ensure the image covers the circle
-                    height: "100%", // Adjust height to fill the container
+                    width: "auto",
+                    height: "100%",
                     objectFit: "cover",
                     borderRadius: "50%",
                   }}
@@ -71,16 +76,10 @@ export default function Dashboard() {
             className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
           >
             <li>
-              <a className="justify-between">
-                Profile
-                <span className="badge">New</span>
-              </a>
+              <a className="justify-between">Profile</a>
             </li>
             <li>
-              <a>Settings</a>
-            </li>
-            <li>
-              <a>Logout</a>
+              <a onClick={logout}>Logout</a>
             </li>
           </ul>
         </div>

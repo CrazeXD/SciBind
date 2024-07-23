@@ -50,6 +50,14 @@ class EventModel(models.Model):
         ('none', 'None')
     ]
     materialtype = models.CharField(max_length=100, choices=materialchoices)
+    divchoices = ('a', 'b', 'c')
+    divchoices = [(x, x) for x in divchoices]
+    division = models.CharField(max_length=1, choices=divchoices)
+    # Check if there are objects of this instance
+    def __str__(self):
+        return self.name
+    def has_objects(self):
+        return self.bindermodel_set.exists()
 
 class BinderModel(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)

@@ -4,10 +4,15 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function LoginForm() {
+  const router = useRouter();
+  if (localStorage.getItem('token')) {
+    router.push('/dashboard');
+  }
+
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const router = useRouter();
+  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

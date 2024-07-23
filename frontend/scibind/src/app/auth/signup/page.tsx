@@ -11,6 +11,9 @@ export default function SignupForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
+  if (localStorage.getItem('token')) {
+    router.push('/dashboard');
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

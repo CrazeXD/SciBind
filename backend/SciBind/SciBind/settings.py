@@ -132,3 +132,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'app.User'
 
 MEDIA_ROOT = BASE_DIR / 'media'
+
+default_app_config = 'app.apps.AppConfig'
