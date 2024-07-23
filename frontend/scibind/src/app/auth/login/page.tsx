@@ -2,10 +2,11 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Navbar from '@/components/navbar';
 
 export default function LoginForm() {
   const router = useRouter();
-  if (localStorage.getItem('token')) {
+  if (typeof window !== 'undefined' && localStorage.getItem('token')) {
     router.push('/dashboard');
   }
 
@@ -40,6 +41,8 @@ export default function LoginForm() {
   };
 
   return (
+    <>
+    <Navbar />
     <div className="min-h-screen bg-base-200 flex flex-col justify-center items-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
@@ -92,5 +95,6 @@ export default function LoginForm() {
         </form>
       </div>
     </div>
+    </>
   );
 }
