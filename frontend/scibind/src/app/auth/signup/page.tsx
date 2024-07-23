@@ -11,7 +11,7 @@ export default function SignupForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
-  if (localStorage.getItem('token')) {
+  if (typeof window !== 'undefined' && localStorage.getItem('token')) {
     router.push('/dashboard');
   }
 
