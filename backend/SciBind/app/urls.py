@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import Binders, Events
-from .views import register, login, logout, user, profile_picture
+from .views import register, login, logout, user, profile_picture, validate_token
 
 
 
@@ -16,4 +16,5 @@ urlpatterns = [
     path('logout/', logout),
     path('user/', user),
     path('picture/', profile_picture),
+    path('verify/', validate_token),
 ]

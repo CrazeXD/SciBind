@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function SignupForm() {
@@ -11,9 +11,30 @@ export default function SignupForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
-  if (typeof window !== 'undefined' && localStorage.getItem('token')) {
-    router.push('/dashboard');
-  }
+  
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        if (typeof window !== "undefined" && localStorage.getItem("token")) {
+          let response = await fetch("http://127.0.0.1:8000/api/verify/", {
+            method: "POST",
+            headers: {
+              Authorization: `Token ${localStorage.getItem("token")}`,
+            },
+          });
+          if (response.ok) {
+            router.push("/dashboard");
+          } else {
+            localStorage.removeItem("token");
+          }
+        }
+      } catch (error) {
+        console.error("Error verifying token");
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

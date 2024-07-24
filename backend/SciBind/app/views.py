@@ -1,21 +1,21 @@
-from django.http import FileResponse
+import os
+
 from django.conf import settings
-from rest_framework import viewsets
-from .models import BinderModel, EventModel, User
-from .serializers import BinderSerializer, EventSerializer
-from rest_framework.response import Response
-from django.views import View
-
-from rest_framework import permissions
-from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.response import Response
-from rest_framework.authtoken.models import Token
-
 from django.contrib.auth import authenticate
+from django.http import FileResponse
+from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 
-import os
+from django.db.models import Q
+
+from rest_framework import permissions, status
+from rest_framework.authtoken.models import Token
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
+from rest_framework import viewsets
+
+from .models import BinderModel, EventModel, User
+from .serializers import BinderSerializer, EventSerializer
 
 def get_user(request):
     if 'Authorization' not in request.headers:
@@ -42,7 +42,7 @@ class Binders(viewsets.ModelViewSet):
         user = get_user(request)
         if user is None:
             return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
-        queryset = BinderModel.objects.filter(owner=user)
+        queryset = BinderModel.objects.filter(Q(owner=user) | Q(shared_with__contains=[user]))
         serializer = BinderSerializer(queryset, many=True)
         return Response(serializer.data)
 
@@ -167,3 +167,19 @@ def profile_picture(request):
             )
             return response
     return Response({'error': 'Profile picture not found'}, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['POST'])
+def validate_token(request):
+    """
+    A view for handling token validation requests.
+
+    Args:
+        request: The request object.
+
+    Returns:
+        Response: A response containing a message.
+    """
+    user = get_user(request)
+    if user is None:
+        return Response({'error': 'Invalid token'}, status=status.HTTP_401_UNAUTHORIZED)
+    return Response({'message': 'Token is valid'})
