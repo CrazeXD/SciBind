@@ -7,7 +7,9 @@ import Binder from "@/components/binder";
 
 export default function Dashboard() {
   const router = useRouter();
-  const [binders, setBinders] = useState<{ event: string; materialtype: string }[]>([]);
+  const [binders, setBinders] = useState<
+    { event: string; materialtype: string }[]
+  >([]);
 
   useEffect(() => {
     const validateToken = async () => {
@@ -74,9 +76,31 @@ export default function Dashboard() {
         <h1 className="text-3xl font-bold mb-6">Your Binders</h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {binders.map((binderobj) => (
-            <Binder event={binderobj.event} type={binderobj.materialtype} key={binderobj.event} />
+            <Binder
+              event={binderobj.event}
+              type={binderobj.materialtype}
+              key={binderobj.event}
+            />
           ))}
         </div>
+      </div>
+      <div className="fixed bottom-4 right-4">
+        <button className="btn btn-circle btn-outline">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M12 6v12M6 12h12"
+            />
+          </svg>
+        </button>
       </div>
     </div>
   );

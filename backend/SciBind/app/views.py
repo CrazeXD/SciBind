@@ -42,9 +42,15 @@ class Binders(viewsets.ModelViewSet):
         user = get_user(request)
         if user is None:
             return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
-        queryset = BinderModel.objects.filter(Q(owner=user) | Q(shared_with__contains=[user]))
+        queryset = BinderModel.objects.filter(Q(owner=user) | Q(shared_with=user)).distinct()
         serializer = BinderSerializer(queryset, many=True)
         return Response(serializer.data)
+    def create(self, request):
+        user = get_user(request)
+        if user is None:
+            return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+        request.data['owner'] = user.id
+        return super().create(request)
 
 class Events(viewsets.ModelViewSet):
     """
@@ -183,3 +189,26 @@ def validate_token(request):
     if user is None:
         return Response({'error': 'Invalid token'}, status=status.HTTP_401_UNAUTHORIZED)
     return Response({'message': 'Token is valid'})
+
+@api_view(['POST'])
+def set_events(request):
+    """
+    A view for handling setting events requests.
+
+    Args:
+        request: The request object.
+
+    Returns:
+        Response: A response containing a message.
+    """
+    user = get_user(request)
+    if user is None:
+        return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+    user.events.clear()
+    for event in request.data['events']:
+        try:
+            event = EventModel.objects.get(name=event)
+            user.events.add(event)
+        except EventModel.DoesNotExist:
+            return Response({'error': 'Event not found'}, status=status.HTTP_404_NOT_FOUND)
+    return Response({'message': 'Events set'})

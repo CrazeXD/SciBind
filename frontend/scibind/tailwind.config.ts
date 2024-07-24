@@ -6,9 +6,9 @@ const config: Config = {
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
-  themes: [
-    {
-      mytheme: {
+  theme: {
+    extend: {
+      colors: {
         "primary": "#0284c7",
         "secondary": "#a5f3fc",
         "accent": "#14b8a6",
@@ -20,9 +20,25 @@ const config: Config = {
         "error": "#ef4444",
       },
     },
-    ],
+  },
   plugins: [
     require('daisyui'),
   ],
+  daisyui: {
+    themes: ["light", "dark", {
+      mytheme: {
+        "primary": "#0284c7",
+        "secondary": "#a5f3fc",
+        "accent": "#14b8a6",
+        "neutral": "#374151",
+        "base-100": "#1f2937",
+        "info": "#0000ff",
+        "success": "#4ade80",
+        "warning": "#facc15",
+        "error": "#ef4444",
+      },
+    }],
+  },
 };
+
 export default config;

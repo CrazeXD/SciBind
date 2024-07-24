@@ -16,9 +16,9 @@ export default function Binder({ event, type }: BinderProps): ReactElement {
         />
       </figure>
       <div className="card-body">
-        <h2 className="card-title text-lg font-semibold">{event}</h2>
+        <h2 className="card-title text-2xl font-semibold">{event}</h2>
         <div className="flex justify-between items-center mt-2">
-          <div className="badge badge-secondary">{type}</div>
+          <div className="badge badge-secondary p-3">{type}</div>
           <button className="btn btn-primary btn-sm">Open</button>
         </div>
       </div>
