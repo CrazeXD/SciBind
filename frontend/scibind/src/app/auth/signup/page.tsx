@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-export default function SignupForm() {
+export default function Initial() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -58,7 +58,7 @@ export default function SignupForm() {
       if (response.ok) {
         const data = await response.json();
         localStorage.setItem("token", data.token);
-        router.push("/dashboard");
+        router.push("/auth/signup/select-events");
       } else {
         setError("Something went wrong. Please try again.");
       }
