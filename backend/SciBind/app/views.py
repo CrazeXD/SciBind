@@ -17,6 +17,16 @@ from django.views.decorators.csrf import csrf_exempt
 
 import os
 
+def get_user(request):
+    if 'Authorization' not in request.headers:
+        return None
+    token = request.headers.get('Authorization').split(' ')[1]
+    try:
+        user = Token.objects.get(key=token).user
+        return user
+    except Token.DoesNotExist:
+        return None
+
 class Binders(viewsets.ModelViewSet):
     """
     A viewset for handling operations related to binders.
@@ -29,9 +39,10 @@ class Binders(viewsets.ModelViewSet):
     serializer_class = BinderSerializer
     queryset = BinderModel.objects.all()
     def list(self, request):
-        # Get user from request in context of rest_framework
-        user = request.user
-        queryset = BinderModel.objects.all(owner=user)
+        user = get_user(request)
+        if user is None:
+            return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+        queryset = BinderModel.objects.filter(owner=user)
         serializer = BinderSerializer(queryset, many=True)
         return Response(serializer.data)
 
@@ -123,8 +134,9 @@ def user(request):
     Returns:
         Response: A response containing the user's data.
     """
-    token = request.headers.get('Authorization').split(' ')[1]
-    user = Token.objects.get(key=token).user
+    user = get_user(request)
+    if user is None:
+        return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
     return Response({
         'username': user.username, 
         'email': user.email, 
@@ -143,8 +155,9 @@ def profile_picture(request):
     Returns:
         Response: A response containing the user's profile picture.
     """
-    token = request.headers.get('Authorization').split(' ')[1]
-    user = Token.objects.get(key=token).user
+    user = get_user(request)
+    if user is None:
+        return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
     if user.profile_picture:
         file_path = os.path.join(settings.MEDIA_ROOT, str(user.profile_picture))
         if os.path.exists(file_path):

@@ -63,7 +63,15 @@ class BinderModel(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     event = models.ForeignKey(EventModel, on_delete=models.CASCADE)
     date = models.DateField(auto_now_add=True)
-    shared_with = models.ManyToManyField(User, related_name='shared_binders')
-    def __init__(self, document, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['document'] = DocumentField(document=document)
+    shared_with = models.ManyToManyField(User, related_name='shared_binders', blank=True)
+    materialtype = models.CharField(max_length=100, choices=EventModel.materialchoices, blank=True)
+    division = models.CharField(max_length=1, choices=EventModel.divchoices, blank=True)
+
+    def save(self, *args, **kwargs):
+        if self.event:
+            self.materialtype = self.event.materialtype
+            self.division = self.event.division
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.event.name} Binder - {self.owner.username}"
