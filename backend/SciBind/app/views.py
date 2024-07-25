@@ -55,17 +55,16 @@ class Binders(viewsets.ModelViewSet):
 class Events(viewsets.ModelViewSet):
     """
     A viewset for handling operations related to Science Olympiad events.
-
-    Args:
-        request: The request object.
-
-    Returns:
-        Response: A response containing data of all events serialized.
     """
     model = EventModel
     serializer_class = EventSerializer
     queryset = EventModel.objects.all()
-    def list(self, _):
+
+    def list(self, request):
+        user = get_user(request)
+        if user is None:
+            return Response({'error': 'Invalid token'}, status=status.HTTP_401_UNAUTHORIZED)
+        
         queryset = EventModel.objects.all()
         serializer = EventSerializer(queryset, many=True)
         return Response(serializer.data)
@@ -204,11 +203,12 @@ def set_events(request):
     user = get_user(request)
     if user is None:
         return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
-    user.events.clear()
+    user.chosen_events.clear()
     for event in request.data['events']:
         try:
             event = EventModel.objects.get(name=event)
-            user.events.add(event)
+            user.chosen_events.add(event)
         except EventModel.DoesNotExist:
+            print(f'Event {event} not found')
             return Response({'error': 'Event not found'}, status=status.HTTP_404_NOT_FOUND)
     return Response({'message': 'Events set'})

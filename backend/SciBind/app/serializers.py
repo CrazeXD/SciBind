@@ -9,4 +9,4 @@ class BinderSerializer(serializers.ModelSerializer):
 class EventSerializer(serializers.ModelSerializer):
     class Meta:
         model = EventModel
-        fields = '__all__'
+        fields = ['name', 'division', 'materialtype']
