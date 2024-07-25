@@ -77,6 +77,7 @@ export default function Navbar() {
             <li>
               <a className="justify-between">Profile</a>
             </li>
+            <li><a href="/select-events" className="justify-between">Events</a></li>
             <li>
               <a onClick={() => logout()}>Logout</a>
             </li>

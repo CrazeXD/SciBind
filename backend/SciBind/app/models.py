@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from .helpers import document
+from .helpers.document import document
 from SciBind.settings import MEDIA_ROOT
 
 import os
@@ -42,7 +42,7 @@ def set_random_profile_picture(sender, instance, created, **kwargs):
         instance.save()
     
 class EventModel(models.Model):
-    name = models.CharField(max_length=100, unique=True, primary_key=True)
+    name = models.CharField(max_length=100)
     # materialtype can either be 'binder', 'cheat sheet', or 'none'
     materialchoices = [
         ('binder', 'Binder'),
@@ -63,7 +63,15 @@ class BinderModel(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     event = models.ForeignKey(EventModel, on_delete=models.CASCADE)
     date = models.DateField(auto_now_add=True)
-    shared_with = models.ManyToManyField(User, related_name='shared_binders')
-    def __init__(self, document, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['document'] = DocumentField(document=document)
+    shared_with = models.ManyToManyField(User, related_name='shared_binders', blank=True)
+    materialtype = models.CharField(max_length=100, choices=EventModel.materialchoices, blank=True)
+    division = models.CharField(max_length=1, choices=EventModel.divchoices, blank=True)
+    old = models.BooleanField(default=False)
+    def save(self, *args, **kwargs):
+        if self.event:
+            self.materialtype = self.event.materialtype
+            self.division = self.event.division
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.event.name} Binder - {self.owner.username}"

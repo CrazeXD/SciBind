@@ -1,21 +1,30 @@
-from django.http import FileResponse
+import os
+
 from django.conf import settings
-from rest_framework import viewsets
-from .models import BinderModel, EventModel, User
-from .serializers import BinderSerializer, EventSerializer
-from rest_framework.response import Response
-from django.views import View
-
-from rest_framework import permissions
-from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.response import Response
-from rest_framework.authtoken.models import Token
-
 from django.contrib.auth import authenticate
+from django.http import FileResponse
 from django.views.decorators.csrf import csrf_exempt
 
-import os
+from django.db.models import Q
+
+from rest_framework import permissions, status
+from rest_framework.authtoken.models import Token
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
+from rest_framework import viewsets
+
+from .models import BinderModel, EventModel, User
+from .serializers import BinderSerializer, EventSerializer
+
+def get_user(request):
+    if 'Authorization' not in request.headers:
+        return None
+    token = request.headers.get('Authorization').split(' ')[1]
+    try:
+        user = Token.objects.get(key=token).user
+        return user
+    except Token.DoesNotExist:
+        return None
 
 class Binders(viewsets.ModelViewSet):
     """
@@ -29,26 +38,32 @@ class Binders(viewsets.ModelViewSet):
     serializer_class = BinderSerializer
     queryset = BinderModel.objects.all()
     def list(self, request):
-        # Get user from request in context of rest_framework
-        user = request.user
-        queryset = BinderModel.objects.all(owner=user)
+        user = get_user(request)
+        if user is None:
+            return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+        queryset = BinderModel.objects.filter(Q(owner=user) | Q(shared_with=user), old=False).distinct()
         serializer = BinderSerializer(queryset, many=True)
         return Response(serializer.data)
+    def create(self, request):
+        user = get_user(request)
+        if user is None:
+            return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+        request.data['owner'] = user.id
+        return super().create(request)
 
 class Events(viewsets.ModelViewSet):
     """
     A viewset for handling operations related to Science Olympiad events.
-
-    Args:
-        request: The request object.
-
-    Returns:
-        Response: A response containing data of all events serialized.
     """
     model = EventModel
     serializer_class = EventSerializer
     queryset = EventModel.objects.all()
-    def list(self, _):
+
+    def list(self, request):
+        user = get_user(request)
+        if user is None:
+            return Response({'error': 'Invalid token'}, status=status.HTTP_401_UNAUTHORIZED)
+        
         queryset = EventModel.objects.all()
         serializer = EventSerializer(queryset, many=True)
         return Response(serializer.data)
@@ -123,8 +138,9 @@ def user(request):
     Returns:
         Response: A response containing the user's data.
     """
-    token = request.headers.get('Authorization').split(' ')[1]
-    user = Token.objects.get(key=token).user
+    user = get_user(request)
+    if user is None:
+        return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
     return Response({
         'username': user.username, 
         'email': user.email, 
@@ -143,8 +159,9 @@ def profile_picture(request):
     Returns:
         Response: A response containing the user's profile picture.
     """
-    token = request.headers.get('Authorization').split(' ')[1]
-    user = Token.objects.get(key=token).user
+    user = get_user(request)
+    if user is None:
+        return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
     if user.profile_picture:
         file_path = os.path.join(settings.MEDIA_ROOT, str(user.profile_picture))
         if os.path.exists(file_path):
@@ -154,3 +171,84 @@ def profile_picture(request):
             )
             return response
     return Response({'error': 'Profile picture not found'}, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['POST'])
+def validate_token(request):
+    """
+    A view for handling token validation requests.
+
+    Args:
+        request: The request object.
+
+    Returns:
+        Response: A response containing a message.
+    """
+    user = get_user(request)
+    if user is None:
+        return Response({'error': 'Invalid token'}, status=status.HTTP_401_UNAUTHORIZED)
+    return Response({'message': 'Token is valid'})
+
+@api_view(['POST'])
+def set_events(request):
+    """
+    A view for handling setting events requests.
+
+    Args:
+        request: The request object.
+
+    Returns:
+        Response: A response containing a message.
+    """
+    user = get_user(request)
+    if user is None:
+        return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    # TODO: Add logic for event division migration
+    # Get the new set of event IDs
+    new_event_ids = set(request.data.get('events', []))
+
+    # Get the current set of event IDs
+    current_event_ids = set(user.chosen_events.values_list('id', flat=True))
+
+    # Find events to add and remove
+    events_to_add = new_event_ids - current_event_ids
+    events_to_remove = current_event_ids - new_event_ids
+
+    # Remove events
+    user.chosen_events.remove(*events_to_remove)
+
+    # Add new events
+    for event_id in events_to_add:
+        try:
+            event = EventModel.objects.get(id=event_id)
+            user.chosen_events.add(event)
+        except EventModel.DoesNotExist:
+            return Response({'error': f'Event with id {event_id} not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    # Update binders
+    BinderModel.objects.filter(owner=user).update(old=True)
+    
+    for event in user.chosen_events.all():
+        binder, created = BinderModel.objects.get_or_create(owner=user, event=event)
+        binder.old = False
+        binder.save()
+
+    return Response({'message': 'Events set successfully'})
+
+@api_view(['GET'])
+def get_events(request):
+    """
+    A view for handling getting events requests.
+
+    Args:
+        request: The request object.
+
+    Returns:
+        Response: A response containing the user's chosen events.
+    """
+    user = get_user(request)
+    if user is None:
+        return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+    events = user.chosen_events.all()
+    serializer = EventSerializer(events, many=True)
+    return Response(serializer.data)
