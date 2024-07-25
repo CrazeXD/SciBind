@@ -9,21 +9,28 @@ import os
 import random
 # Create your models here.
 
+
 class DocumentField(models.Field):
     description = "A document field that can be added to a binder"
+
     def __init__(self, document, *args, **kwargs):
         self.document = document
         super().__init__(*args, **kwargs)
+
     def db_type(self, connection):
         return 'document'
+
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()
         kwargs['document'] = self.document
         return name, path, args, kwargs
 
+
 class User(AbstractUser):
     chosen_events = models.ManyToManyField('EventModel', related_name='owners')
-    profile_picture = models.ImageField(upload_to='profile_pictures', default='profile_pictures/default.png')
+    profile_picture = models.ImageField(
+        upload_to='profile_pictures', default='profile_pictures/default.png')
+
 
 def get_random_profile_picture():
     template_dir = os.path.join(MEDIA_ROOT, 'profile_pictures', 'templates')
@@ -35,12 +42,14 @@ def get_random_profile_picture():
         return os.path.join('profile_pictures', 'templates', random.choice(templates))
     return 'profile_pictures/default.png'
 
+
 @receiver(post_save, sender=User)
 def set_random_profile_picture(sender, instance, created, **kwargs):
     if created:
         instance.profile_picture = get_random_profile_picture()
         instance.save()
-    
+
+
 class EventModel(models.Model):
     name = models.CharField(max_length=100)
     # materialtype can either be 'binder', 'cheat sheet', or 'none'
@@ -54,19 +63,26 @@ class EventModel(models.Model):
     divchoices = [(x, x) for x in divchoices]
     division = models.CharField(max_length=1, choices=divchoices)
     # Check if there are objects of this instance
+
     def __str__(self):
         return self.name
+
     def has_objects(self):
         return self.bindermodel_set.exists()
+
 
 class BinderModel(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     event = models.ForeignKey(EventModel, on_delete=models.CASCADE)
     date = models.DateField(auto_now_add=True)
-    shared_with = models.ManyToManyField(User, related_name='shared_binders', blank=True)
-    materialtype = models.CharField(max_length=100, choices=EventModel.materialchoices, blank=True)
-    division = models.CharField(max_length=1, choices=EventModel.divchoices, blank=True)
+    shared_with = models.ManyToManyField(
+        User, related_name='shared_binders', blank=True)
+    materialtype = models.CharField(
+        max_length=100, choices=EventModel.materialchoices, blank=True)
+    division = models.CharField(
+        max_length=1, choices=EventModel.divchoices, blank=True)
     old = models.BooleanField(default=False)
+
     def save(self, *args, **kwargs):
         if self.event:
             self.materialtype = self.event.materialtype

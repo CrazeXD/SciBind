@@ -16,15 +16,17 @@ from rest_framework import viewsets
 from .models import BinderModel, EventModel, User
 from .serializers import BinderSerializer, EventSerializer
 
+
 def get_user(request):
-    if 'Authorization' not in request.headers:
+    if "Authorization" not in request.headers:
         return None
-    token = request.headers.get('Authorization').split(' ')[1]
+    token = request.headers.get("Authorization").split(" ")[1]
     try:
         user = Token.objects.get(key=token).user
         return user
     except Token.DoesNotExist:
         return None
+
 
 class Binders(viewsets.ModelViewSet):
     """
@@ -34,27 +36,38 @@ class Binders(viewsets.ModelViewSet):
     Returns:
         Response: A response containing data of all binders serialized.
     """
+
     model = BinderModel
     serializer_class = BinderSerializer
     queryset = BinderModel.objects.all()
+
     def list(self, request):
         user = get_user(request)
         if user is None:
-            return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
-        queryset = BinderModel.objects.filter(Q(owner=user) | Q(shared_with=user), old=False).distinct()
+            return Response(
+                {"error": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST
+            )
+        queryset = BinderModel.objects.filter(
+            Q(owner=user) | Q(shared_with=user), old=False
+        ).distinct()
         serializer = BinderSerializer(queryset, many=True)
         return Response(serializer.data)
+
     def create(self, request):
         user = get_user(request)
         if user is None:
-            return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
-        request.data['owner'] = user.id
+            return Response(
+                {"error": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST
+            )
+        request.data["owner"] = user.id
         return super().create(request)
+
 
 class Events(viewsets.ModelViewSet):
     """
     A viewset for handling operations related to Science Olympiad events.
     """
+
     model = EventModel
     serializer_class = EventSerializer
     queryset = EventModel.objects.all()
@@ -62,15 +75,20 @@ class Events(viewsets.ModelViewSet):
     def list(self, request):
         user = get_user(request)
         if user is None:
-            return Response({'error': 'Invalid token'}, status=status.HTTP_401_UNAUTHORIZED)
-        
+            return Response(
+                {"error": "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED
+            )
+
         queryset = EventModel.objects.all()
         serializer = EventSerializer(queryset, many=True)
         return Response(serializer.data)
 
+
 # User views
+
+
 @csrf_exempt
-@api_view(['POST'])
+@api_view(["POST"])
 @permission_classes([permissions.AllowAny])
 def login(request):
     """
@@ -82,15 +100,18 @@ def login(request):
     Returns:
         Response: A response containing the user's token.
     """
-    username = request.data.get('username')
-    password = request.data.get('password')
+    username = request.data.get("username")
+    password = request.data.get("password")
     user = authenticate(username=username, password=password)
     if user is None:
-        return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            {"error": "Invalid credentials"}, status=status.HTTP_400_BAD_REQUEST
+        )
     token, _ = Token.objects.get_or_create(user=user)
-    return Response({'token': token.key})
+    return Response({"token": token.key})
 
-@api_view(['POST'])
+
+@api_view(["POST"])
 @permission_classes([permissions.AllowAny])
 def register(request):
     """
@@ -102,16 +123,23 @@ def register(request):
     Returns:
         Response: A response containing the user's token.
     """
-    username = request.data.get('username')
-    password = request.data.get('password')
-    email = request.data.get('email')
-    first_name = request.data.get('first_name')
-    last_name = request.data.get('last_name')
-    user = User.objects.create_user(username=username, password=password, email=email, first_name=first_name, last_name=last_name)
+    username = request.data.get("username")
+    password = request.data.get("password")
+    email = request.data.get("email")
+    first_name = request.data.get("first_name")
+    last_name = request.data.get("last_name")
+    user = User.objects.create_user(
+        username=username,
+        password=password,
+        email=email,
+        first_name=first_name,
+        last_name=last_name,
+    )
     token, _ = Token.objects.get_or_create(user=user)
-    return Response({'token': token.key})
+    return Response({"token": token.key})
 
-@api_view(['POST'])
+
+@api_view(["POST"])
 @permission_classes([permissions.IsAuthenticated])
 def logout(request):
     """
@@ -124,9 +152,10 @@ def logout(request):
         Response: A response containing a message.
     """
     request.user.auth_token.delete()
-    return Response({'message': 'Successfully logged out'})
+    return Response({"message": "Successfully logged out"})
 
-@api_view(['GET'])
+
+@api_view(["GET"])
 @permission_classes([permissions.IsAuthenticated])
 def user(request):
     """
@@ -140,15 +169,18 @@ def user(request):
     """
     user = get_user(request)
     if user is None:
-        return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
-    return Response({
-        'username': user.username, 
-        'email': user.email, 
-        'first_name': user.first_name, 
-        'last_name': user.last_name,
-    })
-    
-@api_view(['GET'])
+        return Response({"error": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
+    return Response(
+        {
+            "username": user.username,
+            "email": user.email,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+        }
+    )
+
+
+@api_view(["GET"])
 def profile_picture(request):
     """
     A view for handling profile picture requests.
@@ -161,18 +193,21 @@ def profile_picture(request):
     """
     user = get_user(request)
     if user is None:
-        return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"error": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
     if user.profile_picture:
         file_path = os.path.join(settings.MEDIA_ROOT, str(user.profile_picture))
         if os.path.exists(file_path):
-            response = FileResponse(open(file_path, 'rb'))
-            response['Content-Disposition'] = (
-                f'inline; filename={os.path.basename(file_path)}'
+            response = FileResponse(open(file_path, "rb"))
+            response["Content-Disposition"] = (
+                f"inline; filename={os.path.basename(file_path)}"
             )
             return response
-    return Response({'error': 'Profile picture not found'}, status=status.HTTP_404_NOT_FOUND)
+    return Response(
+        {"error": "Profile picture not found"}, status=status.HTTP_404_NOT_FOUND
+    )
 
-@api_view(['POST'])
+
+@api_view(["POST"])
 def validate_token(request):
     """
     A view for handling token validation requests.
@@ -185,10 +220,11 @@ def validate_token(request):
     """
     user = get_user(request)
     if user is None:
-        return Response({'error': 'Invalid token'}, status=status.HTTP_401_UNAUTHORIZED)
-    return Response({'message': 'Token is valid'})
+        return Response({"error": "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED)
+    return Response({"message": "Token is valid"})
 
-@api_view(['POST'])
+
+@api_view(["POST"])
 def set_events(request):
     """
     A view for handling setting events requests.
@@ -201,14 +237,14 @@ def set_events(request):
     """
     user = get_user(request)
     if user is None:
-        return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
-    
+        return Response({"error": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
+
     # TODO: Add logic for event division migration
     # Get the new set of event IDs
-    new_event_ids = set(request.data.get('events', []))
+    new_event_ids = set(request.data.get("events", []))
 
     # Get the current set of event IDs
-    current_event_ids = set(user.chosen_events.values_list('id', flat=True))
+    current_event_ids = set(user.chosen_events.values_list("id", flat=True))
 
     # Find events to add and remove
     events_to_add = new_event_ids - current_event_ids
@@ -223,19 +259,23 @@ def set_events(request):
             event = EventModel.objects.get(id=event_id)
             user.chosen_events.add(event)
         except EventModel.DoesNotExist:
-            return Response({'error': f'Event with id {event_id} not found'}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"error": f"Event with id {event_id} not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
 
     # Update binders
     BinderModel.objects.filter(owner=user).update(old=True)
-    
+
     for event in user.chosen_events.all():
         binder, created = BinderModel.objects.get_or_create(owner=user, event=event)
         binder.old = False
         binder.save()
 
-    return Response({'message': 'Events set successfully'})
+    return Response({"message": "Events set successfully"})
 
-@api_view(['GET'])
+
+@api_view(["GET"])
 def get_events(request):
     """
     A view for handling getting events requests.
@@ -248,7 +288,7 @@ def get_events(request):
     """
     user = get_user(request)
     if user is None:
-        return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"error": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
     events = user.chosen_events.all()
     serializer = EventSerializer(events, many=True)
     return Response(serializer.data)
