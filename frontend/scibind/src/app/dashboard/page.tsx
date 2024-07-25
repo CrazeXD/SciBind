@@ -8,7 +8,7 @@ import Binder from "@/components/binder";
 export default function Dashboard() {
   const router = useRouter();
   const [binders, setBinders] = useState<
-    { event: string; materialtype: string }[]
+      { id: number; event: string; materialtype: string }[]
   >([]);
 
   useEffect(() => {
@@ -79,29 +79,12 @@ export default function Dashboard() {
             <Binder
               event={binderobj.event}
               type={binderobj.materialtype}
-              key={binderobj.event}
+              key={binderobj.id}
             />
           ))}
         </div>
       </div>
-      <div className="fixed bottom-4 right-4">
-        <button className="btn btn-circle btn-outline">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M12 6v12M6 12h12"
-            />
-          </svg>
-        </button>
-      </div>
+      <p>Don't see one of your binders? It may have been marked as old. Check your events and reselect it to get access back.</p>
     </div>
   );
 }

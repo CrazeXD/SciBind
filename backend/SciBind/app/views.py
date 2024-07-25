@@ -42,7 +42,7 @@ class Binders(viewsets.ModelViewSet):
         user = get_user(request)
         if user is None:
             return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
-        queryset = BinderModel.objects.filter(Q(owner=user) | Q(shared_with=user)).distinct()
+        queryset = BinderModel.objects.filter(Q(owner=user) | Q(shared_with=user), old=False).distinct()
         serializer = BinderSerializer(queryset, many=True)
         return Response(serializer.data)
     def create(self, request):
@@ -203,12 +203,53 @@ def set_events(request):
     user = get_user(request)
     if user is None:
         return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
-    user.chosen_events.clear()
-    for event in request.data['events']:
+    
+    # TODO: Add logic for event division migration
+    # Get the new set of event IDs
+    new_event_ids = set(request.data.get('events', []))
+
+    # Get the current set of event IDs
+    current_event_ids = set(user.chosen_events.values_list('id', flat=True))
+
+    # Find events to add and remove
+    events_to_add = new_event_ids - current_event_ids
+    events_to_remove = current_event_ids - new_event_ids
+
+    # Remove events
+    user.chosen_events.remove(*events_to_remove)
+
+    # Add new events
+    for event_id in events_to_add:
         try:
-            event = EventModel.objects.get(name=event)
+            event = EventModel.objects.get(id=event_id)
             user.chosen_events.add(event)
         except EventModel.DoesNotExist:
-            print(f'Event {event} not found')
-            return Response({'error': 'Event not found'}, status=status.HTTP_404_NOT_FOUND)
-    return Response({'message': 'Events set'})
+            return Response({'error': f'Event with id {event_id} not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    # Update binders
+    BinderModel.objects.filter(owner=user).update(old=True)
+    
+    for event in user.chosen_events.all():
+        binder, created = BinderModel.objects.get_or_create(owner=user, event=event)
+        binder.old = False
+        binder.save()
+
+    return Response({'message': 'Events set successfully'})
+
+@api_view(['GET'])
+def get_events(request):
+    """
+    A view for handling getting events requests.
+
+    Args:
+        request: The request object.
+
+    Returns:
+        Response: A response containing the user's chosen events.
+    """
+    user = get_user(request)
+    if user is None:
+        return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+    events = user.chosen_events.all()
+    serializer = EventSerializer(events, many=True)
+    return Response(serializer.data)

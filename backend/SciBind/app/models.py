@@ -42,7 +42,7 @@ def set_random_profile_picture(sender, instance, created, **kwargs):
         instance.save()
     
 class EventModel(models.Model):
-    name = models.CharField(max_length=100, unique=True)
+    name = models.CharField(max_length=100)
     # materialtype can either be 'binder', 'cheat sheet', or 'none'
     materialchoices = [
         ('binder', 'Binder'),
@@ -66,7 +66,7 @@ class BinderModel(models.Model):
     shared_with = models.ManyToManyField(User, related_name='shared_binders', blank=True)
     materialtype = models.CharField(max_length=100, choices=EventModel.materialchoices, blank=True)
     division = models.CharField(max_length=1, choices=EventModel.divchoices, blank=True)
-
+    old = models.BooleanField(default=False)
     def save(self, *args, **kwargs):
         if self.event:
             self.materialtype = self.event.materialtype
