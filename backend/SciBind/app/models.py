@@ -52,6 +52,7 @@ def set_random_profile_picture(sender, instance, created, **kwargs):
 
 
 class EventModel(models.Model):
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
     # materialtype can either be 'binder', 'cheat sheet', or 'none'
     materialchoices = [
