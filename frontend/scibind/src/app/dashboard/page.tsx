@@ -8,7 +8,7 @@ import Binder from "@/components/binder";
 export default function Dashboard() {
   const router = useRouter();
   const [binders, setBinders] = useState<
-      { id: number; event: string; materialtype: string }[]
+      { id: number; event: string; materialtype: string; division: string;}[]
   >([]);
 
   useEffect(() => {
@@ -79,12 +79,15 @@ export default function Dashboard() {
             <Binder
               event={binderobj.event}
               type={binderobj.materialtype}
+              division={binderobj.division}
               key={binderobj.id}
             />
           ))}
         </div>
       </div>
-      <p>Don't see one of your binders? It may have been marked as old. Check your events and reselect it to get access back.</p>
+      <p className="text-center">
+        Don't see one of your binders? It may have been marked as old. Check your events and reselect it to get access back.
+      </p>
     </div>
   );
 }
