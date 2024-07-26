@@ -87,5 +87,5 @@ class ProfilePictureTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response["Content-Disposition"],
-            f"inline; filename={str(self.user.profile_picture).rsplit('\\')[-1]}",
+            f"inline; filename={str(self.user.profile_picture).rsplit('\\')[-1].rsplit('/')[-1]}",
         )
