@@ -3,29 +3,34 @@ import React from "react";
 
 export default function Header() {
   return (
-    <header className="navbar bg-base-100 shadow-md">
+    <header className="navbar bg-base-200 shadow-sm">
       <div className="flex-1">
-        <a className="btn btn-ghost normal-case text-xl" href="/dashboard">SciBind</a>
+        <a
+          className="btn btn-ghost normal-case text-xl text-primary"
+          href="/dashboard"
+        >
+          SciBind
+        </a>
       </div>
       <div className="flex-none">
         <ul className="menu menu-horizontal px-1">
           <li>
-            <a>File</a>
+            <a className="text-neutral-content">File</a>
           </li>
           <li>
-            <a>Edit</a>
+            <a className="text-neutral-content">Edit</a>
           </li>
           <li>
-            <a>View</a>
+            <a className="text-neutral-content">View</a>
           </li>
           <li>
-            <a>Insert</a>
+            <a className="text-neutral-content">Insert</a>
           </li>
           <li>
-            <a>Format</a>
+            <a className="text-neutral-content">Format</a>
           </li>
           <li>
-            <a>Tools</a>
+            <a className="text-neutral-content">Tools</a>
           </li>
         </ul>
       </div>

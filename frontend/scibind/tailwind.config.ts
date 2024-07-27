@@ -12,6 +12,19 @@ const main_colors = {
   error: "#ef4444",
 };
 
+const doc_colors = {
+  primary: "#3b82f6",
+  secondary: "#34A853",
+  accent: "#FBBC05",
+  neutral: "#efefef",
+  "base-100": "#FFFFFF",
+  "base-200": "#eeeeee",
+  info: "#4285F4",
+  success: "#34A853",
+  warning: "#FBBC05",
+  error: "#EA4335",
+};
+
 const config: Config = {
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
@@ -21,15 +34,19 @@ const config: Config = {
   theme: {
     extend: {
       main_colors: main_colors,
+      doc_colors: doc_colors,
     },
   },
-  plugins: [
-    require('daisyui'),
-  ],
+  plugins: [require("daisyui")],
   daisyui: {
-    themes: ["light", "dark", {
-      main: main_colors,
-    }],
+    themes: [
+      "light",
+      "dark",
+      {
+        main: main_colors,
+        doc: doc_colors,
+      },
+    ],
   },
 };
 

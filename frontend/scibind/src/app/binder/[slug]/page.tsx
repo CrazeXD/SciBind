@@ -7,7 +7,7 @@ import Editor from "@/components/editor";
 
 export default function Home() {
   return (
-    <div className="min-h-screen flex flex-col bg-gray-100">
+    <div className="min-h-screen flex flex-col bg-neutral" data-theme="doc">
       <Head>
         <title>SciBind</title>
         <link rel="icon" href="/favicon.ico" />
@@ -18,7 +18,7 @@ export default function Home() {
         <Toolbar />
       </div>
 
-      <div className="mt-28">
+      <div className="mt-28 flex-grow bg-base-200">
         <Editor />
       </div>
     </div>
