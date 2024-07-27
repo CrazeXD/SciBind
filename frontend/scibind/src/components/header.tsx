@@ -5,7 +5,7 @@ export default function Header() {
   return (
     <header className="navbar bg-base-100 shadow-md">
       <div className="flex-1">
-        <a className="btn btn-ghost normal-case text-xl">Doc Editor</a>
+        <a className="btn btn-ghost normal-case text-xl" href="/dashboard">SciBind</a>
       </div>
       <div className="flex-none">
         <ul className="menu menu-horizontal px-1">

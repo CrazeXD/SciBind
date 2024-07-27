@@ -1,6 +1,6 @@
 import type { Config } from "tailwindcss";
 
-const colors = {
+const main_colors = {
   primary: "#3b82f6",
   secondary: "#94a3b8",
   accent: "#5f73c3",
@@ -20,7 +20,7 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      colors: colors,
+      main_colors: main_colors,
     },
   },
   plugins: [
@@ -28,7 +28,7 @@ const config: Config = {
   ],
   daisyui: {
     themes: ["light", "dark", {
-      mytheme: colors,
+      main: main_colors,
     }],
   },
 };
