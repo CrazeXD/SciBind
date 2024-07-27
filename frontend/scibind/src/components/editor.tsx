@@ -8,17 +8,17 @@ export default function Editor() {
   const PAGE_WIDTH = 816; // A4 width in pixels at 96 DPI
 
   useEffect(() => {
-    if (editorRef.current && editorRef.current.innerHTML === '') {
+    if (editorRef.current && editorRef.current.innerHTML === "") {
       editorRef.current.innerHTML = "Start typing your document here...";
     }
   }, []);
 
   return (
-    <div className="flex-grow bg-gray-300 p-4">
+    <div className="flex-grow bg-base-200 p-4 overflow-auto">
       <div className="w-full max-w-[816px] mx-auto">
         <div
           ref={editorRef}
-          className="w-full p-8 bg-white rounded-lg shadow-sm"
+          className="w-full p-8 bg-base-100 rounded shadow-md border border-gray-300"
           contentEditable={true}
           suppressContentEditableWarning={true}
           style={{
