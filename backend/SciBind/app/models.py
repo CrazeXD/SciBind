@@ -85,7 +85,7 @@ class BinderModel(models.Model):
     )
     division = models.CharField(max_length=1, choices=EventModel.divchoices, blank=True)
     old = models.BooleanField(default=False)
-
+    online_users = models.ManyToManyField(User, related_name="online_binders")
     def save(self, *args, **kwargs):
         if self.event:
             self.materialtype = self.event.materialtype
