@@ -1,16 +1,18 @@
-// components/Toolbar.tsx
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { fas } from "@fortawesome/free-solid-svg-icons";
+
 import React from "react";
 export default function Toolbar() {
   return (
     <div className="bg-base-200 p-2 flex items-center space-x-2">
       <button className="btn btn-sm btn-ghost" title="Bold">
-        <i className="fas fa-bold"></i>
+        <FontAwesomeIcon icon={fas.faBold} />
       </button>
       <button className="btn btn-sm btn-ghost" title="Italic">
-        <i className="fas fa-italic"></i>
+        <FontAwesomeIcon icon={fas.faItalic} />
       </button>
       <button className="btn btn-sm btn-ghost" title="Underline">
-        <i className="fas fa-underline"></i>
+        <FontAwesomeIcon icon={fas.faUnderline} />
       </button>
       <select
         className="select select-sm select-bordered w-full max-w-xs"
@@ -21,7 +23,7 @@ export default function Toolbar() {
         <option>Calibri</option>
       </select>
       <select
-        className="select select-sm select-bordered w-full max-w-xs"
+        className="select select-sm select-bordered max-w-xs"
         title="Font Size"
       >
         <option>8</option>
@@ -31,13 +33,13 @@ export default function Toolbar() {
         <option>16</option>
       </select>
       <button className="btn btn-sm btn-ghost" title="Align Left">
-        <i className="fas fa-align-left"></i>
+        <FontAwesomeIcon icon={fas.faAlignLeft} />
       </button>
       <button className="btn btn-sm btn-ghost" title="Align Center">
-        <i className="fas fa-align-center"></i>
+        <FontAwesomeIcon icon={fas.faAlignCenter} />
       </button>
       <button className="btn btn-sm btn-ghost" title="Align Right">
-        <i className="fas fa-align-right"></i>
+        <FontAwesomeIcon icon={fas.faAlignRight} />
       </button>
     </div>
   );
