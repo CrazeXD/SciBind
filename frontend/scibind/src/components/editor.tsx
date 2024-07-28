@@ -1,17 +1,69 @@
 // components/Editor.tsx
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
+import * as Y from "yjs";
+import { WebsocketProvider } from "y-websocket";
 
-export default function Editor() {
+interface EditorProps {
+  slug: string;
+}
+
+export default function Editor({ slug }: EditorProps) {
   const editorRef = useRef<HTMLDivElement>(null);
+  const [ydoc, setYdoc] = useState<Y.Doc | null>(null);
+  const [provider, setProvider] = useState<WebsocketProvider | null>(null);
 
   const PAGE_HEIGHT = 1056; // A4 height in pixels at 96 DPI
   const PAGE_WIDTH = 816; // A4 width in pixels at 96 DPI
 
   useEffect(() => {
-    if (editorRef.current && editorRef.current.innerHTML === "") {
-      editorRef.current.innerHTML = "Start typing your document here...";
+    if (slug && typeof slug === "string") {
+      const doc = new Y.Doc();
+      const wsProvider = new WebsocketProvider(
+        "ws://localhost:1234",
+        slug,
+        doc
+      );
+      setYdoc(doc);
+      setProvider(wsProvider);
+
+      const ytext = doc.getText("content");
+
+      if (editorRef.current) {
+        editorRef.current.innerHTML =
+          ytext.toString() || "Start typing your binder here...";
+
+        const observer = new MutationObserver(() => {
+          if (editorRef.current) {
+            ytext.delete(0, ytext.length);
+            ytext.insert(0, editorRef.current.innerHTML);
+          }
+        });
+
+        observer.observe(editorRef.current, {
+          childList: true,
+          subtree: true,
+          characterData: true,
+        });
+
+        return () => {
+          observer.disconnect();
+          wsProvider.destroy();
+        };
+      }
     }
-  }, []);
+  }, [slug]);
+
+  useEffect(() => {
+    if (ydoc && provider && editorRef.current) {
+      const ytext = ydoc.getText("content");
+
+      ytext.observe((event) => {
+        if (editorRef.current) {
+          editorRef.current.innerHTML = ytext.toString();
+        }
+      });
+    }
+  }, [ydoc, provider]);
 
   return (
     <div className="flex-grow bg-base-200 p-4 overflow-auto">
