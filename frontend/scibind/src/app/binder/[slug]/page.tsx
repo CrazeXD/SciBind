@@ -33,6 +33,11 @@ export default function BinderEditor() {
         editorMethods.toggleUnderline();
       }
     },
+    onHighlight: (color: string) => {
+      if (editorMethods) {
+        editorMethods.toggleHighlight(color);
+      }
+    },
     onAlignLeft: () => {
       if (editorMethods) {
         editorMethods.alignLeft();

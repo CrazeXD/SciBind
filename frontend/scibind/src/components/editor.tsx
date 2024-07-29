@@ -1,18 +1,20 @@
+import { useEffect, useState } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
+
 import StarterKit from "@tiptap/starter-kit";
-import Collaboration from "@tiptap/extension-collaboration";
-import CollaborationCursor from "@tiptap/extension-collaboration-cursor";
 import Highlight from "@tiptap/extension-highlight";
 import Typography from "@tiptap/extension-typography";
+import Underline from "@tiptap/extension-underline";
+import TextAlign from "@tiptap/extension-text-align";
 import Table from "@tiptap/extension-table";
 import TableRow from "@tiptap/extension-table-row";
-import TableCell from "@tiptap/extension-table-cell";
 import TableHeader from "@tiptap/extension-table-header";
+import TableCell from "@tiptap/extension-table-cell";
 import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
-import TextAlign from "@tiptap/extension-text-align";
-import Underline from "@tiptap/extension-underline";
-import { useEffect, useState } from "react";
+import Collaboration from "@tiptap/extension-collaboration";
+import CollaborationCursor from "@tiptap/extension-collaboration-cursor";
+
 import { WebsocketProvider } from "y-websocket";
 import { EditorMethods } from "@/libs/editormethods";
 
@@ -52,7 +54,9 @@ export default function Editor({ slug, onEditorReady }: EditorProps) {
         StarterKit.configure({
           history: false, // Disable history as we'll use yjs for that
         }),
-        Highlight,
+        Highlight.configure({
+          multicolor: true,
+        }),        
         Typography,
         Underline,
         TextAlign.configure({
@@ -101,6 +105,9 @@ export default function Editor({ slug, onEditorReady }: EditorProps) {
         toggleBold: () => editor.chain().focus().toggleBold().run(),
         toggleItalic: () => editor.chain().focus().toggleItalic().run(),
         toggleUnderline: () => editor.chain().focus().toggleUnderline().run(),
+        toggleHighlight: (color: string) => {
+          editor.chain().focus().toggleHighlight({color: color}).run()
+        },
         insertTable: () => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run(),
         insertImage: (url: string) => editor.chain().focus().setImage({ src: url }).run(),
         insertLink: (url: string) => editor.chain().focus().setLink({ href: url }).run(),
