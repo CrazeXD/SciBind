@@ -11,8 +11,11 @@ import TableHeader from "@tiptap/extension-table-header";
 import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
 import TextAlign from "@tiptap/extension-text-align";
+import Underline from "@tiptap/extension-underline";
 import { useEffect, useState } from "react";
 import { WebsocketProvider } from "y-websocket";
+import { EditorMethods } from "@/libs/editormethods";
+
 import * as Y from "yjs";
 
 const PAGE_HEIGHT = 1056; // A4 height in pixels at 96 DPI
@@ -23,14 +26,6 @@ interface EditorProps {
   onEditorReady: (methods: EditorMethods) => void;
 }
 
-export interface EditorMethods {
-  toggleBold: () => void;
-  toggleItalic: () => void;
-  toggleHighlight: () => void;
-  insertTable: () => void;
-  insertImage: (url: string) => void;
-  insertLink: (url: string) => void;
-}
 
 export default function Editor({ slug, onEditorReady }: EditorProps) {
   const [ydoc, setYdoc] = useState<Y.Doc | null>(null);
@@ -59,7 +54,10 @@ export default function Editor({ slug, onEditorReady }: EditorProps) {
         }),
         Highlight,
         Typography,
-        TextAlign,
+        Underline,
+        TextAlign.configure({
+          types: ['heading', 'paragraph'],
+        }),
         Table.configure({
           resizable: true,
         }),
@@ -102,11 +100,13 @@ export default function Editor({ slug, onEditorReady }: EditorProps) {
       const methods: EditorMethods = {
         toggleBold: () => editor.chain().focus().toggleBold().run(),
         toggleItalic: () => editor.chain().focus().toggleItalic().run(),
-        toggleHighlight: () => editor.chain().focus().toggleHighlight().run(),
+        toggleUnderline: () => editor.chain().focus().toggleUnderline().run(),
         insertTable: () => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run(),
         insertImage: (url: string) => editor.chain().focus().setImage({ src: url }).run(),
         insertLink: (url: string) => editor.chain().focus().setLink({ href: url }).run(),
-        // Add more methods as needed
+        alignLeft: () => editor.chain().focus().setTextAlign("left").run(),
+        alignCenter: () => editor.chain().focus().setTextAlign("center").run(),
+        alignRight: () => editor.chain().focus().setTextAlign("right").run(),
       };
       onEditorReady(methods);
     }
