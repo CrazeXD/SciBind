@@ -6,7 +6,7 @@ import Head from "next/head";
 import Header from "@/components/header";
 import Toolbar from "@/components/toolbar";
 import Editor from "@/components/editor";
-import { EditorMethods } from "@/libs/editormethod";
+import { EditorMethods } from "@/libs/editormethods";
 import { ToolbarProp } from "@/libs/toolbarprop";
 
 export default function BinderEditor() {
