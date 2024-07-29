@@ -1,6 +1,6 @@
 import type { Config } from "tailwindcss";
 
-const colors = {
+const main_colors = {
   primary: "#3b82f6",
   secondary: "#94a3b8",
   accent: "#5f73c3",
@@ -12,6 +12,19 @@ const colors = {
   error: "#ef4444",
 };
 
+const doc_colors = {
+  primary: "#3b82f6",
+  secondary: "#34A853",
+  accent: "#FBBC05",
+  neutral: "#efefef",
+  "base-100": "#FFFFFF",
+  "base-200": "#eeeeee",
+  info: "#4285F4",
+  success: "#34A853",
+  warning: "#FBBC05",
+  error: "#EA4335",
+};
+
 const config: Config = {
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
@@ -20,16 +33,20 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      colors: colors,
+      main_colors: main_colors,
+      doc_colors: doc_colors,
     },
   },
-  plugins: [
-    require('daisyui'),
-  ],
+  plugins: [require("daisyui")],
   daisyui: {
-    themes: ["light", "dark", {
-      mytheme: colors,
-    }],
+    themes: [
+      "light",
+      "dark",
+      {
+        main: main_colors,
+        doc: doc_colors,
+      },
+    ],
   },
 };
 
