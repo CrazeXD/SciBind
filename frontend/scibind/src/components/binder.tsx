@@ -32,7 +32,7 @@ export default function Binder({
             <div className="badge badge-secondary p-3 mr-1">{type}</div>
             <div className="badge badge-accent p-3">Div {division}</div>
           </div>
-          <button className="btn btn-primary btn-sm">Open</button>
+          <button className="btn btn-primary btn-sm" onClick={() => window.location.href = `binder/${id}`}>Open</button>
         </div>
       </div>
     </div>

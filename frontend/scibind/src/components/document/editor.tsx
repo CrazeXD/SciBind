@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
-
 import StarterKit from "@tiptap/starter-kit";
-import Highlight from "@tiptap/extension-highlight";
 import Typography from "@tiptap/extension-typography";
 import Underline from "@tiptap/extension-underline";
 import TextAlign from "@tiptap/extension-text-align";
@@ -14,10 +12,8 @@ import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
 import Collaboration from "@tiptap/extension-collaboration";
 import CollaborationCursor from "@tiptap/extension-collaboration-cursor";
-
 import { WebsocketProvider } from "y-websocket";
 import { EditorMethods } from "@/libs/editormethods";
-
 import * as Y from "yjs";
 
 const PAGE_HEIGHT = 1056; // A4 height in pixels at 96 DPI
@@ -27,7 +23,6 @@ interface EditorProps {
   slug: string;
   onEditorReady: (methods: EditorMethods) => void;
 }
-
 
 export default function Editor({ slug, onEditorReady }: EditorProps) {
   const [ydoc, setYdoc] = useState<Y.Doc | null>(null);
@@ -52,11 +47,8 @@ export default function Editor({ slug, onEditorReady }: EditorProps) {
     {
       extensions: [
         StarterKit.configure({
-          history: false, // Disable history as we'll use yjs for that
-        }),
-        Highlight.configure({
-          multicolor: true,
-        }),        
+          history: false,
+        }),      
         Typography,
         Underline,
         TextAlign.configure({
@@ -94,7 +86,6 @@ export default function Editor({ slug, onEditorReady }: EditorProps) {
       onUpdate: ({ editor }) => {
         // Save content logic here
       },
-      immediatelyRender: false, // Set to false for SSR
     },
     [ydoc, provider]
   );
@@ -105,9 +96,6 @@ export default function Editor({ slug, onEditorReady }: EditorProps) {
         toggleBold: () => editor.chain().focus().toggleBold().run(),
         toggleItalic: () => editor.chain().focus().toggleItalic().run(),
         toggleUnderline: () => editor.chain().focus().toggleUnderline().run(),
-        toggleHighlight: (color: string) => {
-          editor.chain().focus().toggleHighlight({color: color}).run()
-        },
         insertTable: () => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run(),
         insertImage: (url: string) => editor.chain().focus().setImage({ src: url }).run(),
         insertLink: (url: string) => editor.chain().focus().setLink({ href: url }).run(),
@@ -125,11 +113,6 @@ export default function Editor({ slug, onEditorReady }: EditorProps) {
         {editor && <EditorContent editor={editor} />}
       </div>
       <style jsx>{`
-        .page-break {
-          height: 20px;
-          background-color: #f0f0f0;
-          margin: 10px 0;
-        }
         .ProseMirror {
           min-height: ${PAGE_HEIGHT}px;
           width: ${PAGE_WIDTH}px;

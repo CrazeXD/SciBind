@@ -2,7 +2,6 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from .helpers.document import document
 from SciBind.settings import MEDIA_ROOT
 
 import os
@@ -83,6 +82,7 @@ class BinderModel(models.Model):
     materialtype = models.CharField(
         max_length=100, choices=EventModel.materialchoices, blank=True
     )
+    document = DocumentField(document="document", blank=True)
     division = models.CharField(max_length=1, choices=EventModel.divchoices, blank=True)
     old = models.BooleanField(default=False)
     online_users = models.ManyToManyField(User, related_name="online_binders")

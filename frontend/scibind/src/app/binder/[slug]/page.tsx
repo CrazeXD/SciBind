@@ -3,9 +3,9 @@
 import { useEffect, useState, useCallback } from "react";
 import { usePathname } from "next/navigation";
 import Head from "next/head";
-import Header from "@/components/header";
-import Toolbar from "@/components/toolbar";
-import Editor from "@/components/editor";
+import Header from "@/components/document/header";
+import Toolbar from "@/components/document/toolbar";
+import Editor from "@/components/document/editor";
 import { EditorMethods } from "@/libs/editormethods";
 import { ToolbarProp } from "@/libs/toolbarprop";
 
@@ -31,11 +31,6 @@ export default function BinderEditor() {
     onUnderline: () => {
       if (editorMethods) {
         editorMethods.toggleUnderline();
-      }
-    },
-    onHighlight: (color: string) => {
-      if (editorMethods) {
-        editorMethods.toggleHighlight(color);
       }
     },
     onAlignLeft: () => {
