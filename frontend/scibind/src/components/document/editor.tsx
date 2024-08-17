@@ -10,6 +10,9 @@ import TableHeader from "@tiptap/extension-table-header";
 import TableCell from "@tiptap/extension-table-cell";
 import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
+import TextStyle from "@tiptap/extension-text-style";
+import Color from "@tiptap/extension-color";
+import Highlight from "@tiptap/extension-highlight";
 import { EditorMethods } from "@/libs/editormethods";
 
 const PAGE_HEIGHT = 1056; // A4 height in pixels at 96 DPI
@@ -18,14 +21,17 @@ const PAGE_WIDTH = 816; // A4 width in pixels at 96 DPI
 interface EditorProps {
   onEditorReady: (methods: EditorMethods) => void;
   initialContent: string;
+  onEditorUpdate: (content: string) => void;
 }
 
-export default function Editor({ onEditorReady, initialContent }: EditorProps) {
+export default function Editor({
+  onEditorReady,
+  initialContent,
+  onEditorUpdate,
+}: EditorProps) {
   const editor = useEditor({
     extensions: [
-      StarterKit.configure({
-        history: false,
-      }),
+      StarterKit,
       Typography,
       Underline,
       TextAlign.configure({
@@ -41,6 +47,9 @@ export default function Editor({ onEditorReady, initialContent }: EditorProps) {
       Link.configure({
         openOnClick: false,
       }),
+      TextStyle,
+      Color,
+      Highlight.configure({ multicolor: true }),
     ],
     content: "<h1>Start typing your document here...</h1>",
     editorProps: {
@@ -49,6 +58,10 @@ export default function Editor({ onEditorReady, initialContent }: EditorProps) {
           "w-full p-8 bg-base-100 rounded shadow-md border border-gray-300 outline-none prose prose-sm sm:prose lg:prose-lg xl:prose-xl",
         style: `min-height: ${PAGE_HEIGHT}px; color: black;`,
       },
+    },
+    onUpdate: ({ editor }) => {
+      const json = editor.getJSON();
+      onEditorUpdate(JSON.stringify(json));
     },
   });
 
@@ -71,6 +84,12 @@ export default function Editor({ onEditorReady, initialContent }: EditorProps) {
         alignLeft: () => editor.chain().focus().setTextAlign("left").run(),
         alignCenter: () => editor.chain().focus().setTextAlign("center").run(),
         alignRight: () => editor.chain().focus().setTextAlign("right").run(),
+        addColor: (color: string) =>
+          editor.chain().focus().setColor(color).run(),
+        addHighlight: (color: string) =>
+          editor.chain().focus().setHighlight({ color }).run(),
+        undoAction: () => editor.chain().focus().undo().run(),
+        redoAction: () => editor.chain().focus().redo().run(),
       };
       onEditorReady(methods);
     }

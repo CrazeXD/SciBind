@@ -9,6 +9,8 @@ import Editor from "@/components/document/editor";
 import { EditorMethods } from "@/libs/editormethods";
 import { ToolbarProp } from "@/libs/toolbarprop";
 
+import { debounce } from "lodash";
+
 export default function BinderEditor() {
   const [editorMethods, setEditorMethods] = useState<EditorMethods | null>(
     null
@@ -57,9 +59,9 @@ export default function BinderEditor() {
     }
   };
 
-  const saveContent = async (newContent: string) => {
+  const saveContent = debounce(async (newContent: string) => {
     const token = localStorage.getItem("token");
-    if (!token) {
+    if (!token || !slug) {
       return;
     }
     try {
@@ -80,11 +82,7 @@ export default function BinderEditor() {
     } catch (error) {
       console.error("Error saving content:", error);
     }
-  };
-
-  const handleEditorReady = useCallback((methods: EditorMethods) => {
-    setEditorMethods(methods);
-  }, []);
+  }, 1000); // Debounce for 1 second
 
   const handleEditorUpdate = useCallback(
     (newContent: string) => {
@@ -93,6 +91,11 @@ export default function BinderEditor() {
     },
     [slug]
   );
+
+  const handleEditorReady = useCallback((methods: EditorMethods) => {
+    setEditorMethods(methods);
+  }, []);
+
   // Assign the editorMethods to a toolbar prop
   const toolbarMethods: ToolbarProp = {
     onBold: () => {
@@ -125,6 +128,41 @@ export default function BinderEditor() {
         editorMethods.alignRight();
       }
     },
+    onInsertTable: () => {
+      if (editorMethods) {
+        editorMethods.insertTable();
+      }
+    },
+    onInsertImage: (url: string) => {
+      if (editorMethods) {
+        editorMethods.insertImage(url);
+      }
+    },
+    onInsertLink: (url: string) => {
+      if (editorMethods) {
+        editorMethods.insertLink(url);
+      }
+    },
+    onSetColor: (color: string) => {
+      if (editorMethods) {
+        editorMethods.addColor(color);
+      }
+    },
+    onSetHighlight: (color: string) => {
+      if (editorMethods) {
+        editorMethods.addHighlight(color);
+      }
+    },
+    onUndo: () => {
+      if (editorMethods) {
+        editorMethods.undoAction();
+      }
+    },
+    onRedo: () => {
+      if (editorMethods) {
+        editorMethods.redoAction();
+      }
+    },
   };
 
   return (
@@ -141,7 +179,11 @@ export default function BinderEditor() {
 
       <div className="mt-28 flex-grow bg-base-200">
         {slug !== null ? (
-          <Editor onEditorReady={handleEditorReady} initialContent={content} />
+          <Editor
+            onEditorReady={handleEditorReady}
+            initialContent={content}
+            onEditorUpdate={handleEditorUpdate}
+          />
         ) : (
           <div>Loading...</div>
         )}

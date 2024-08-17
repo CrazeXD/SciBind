@@ -8,4 +8,8 @@ export interface EditorMethods {
   alignLeft: () => void;
   alignCenter: () => void;
   alignRight: () => void;
+  addColor: (color: string) => void;
+  addHighlight: (color: string) => void;
+  undoAction: () => void;
+  redoAction: () => void;
 }
