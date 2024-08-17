@@ -143,14 +143,14 @@ export default function BinderEditor() {
         editorMethods.insertLink(url);
       }
     },
-    onSetColor: (color: string) => {
+    onSetColor: (color: string | null = "") => {
       if (editorMethods) {
-        editorMethods.addColor(color);
+        editorMethods.addColor(color || "");
       }
     },
-    onSetHighlight: (color: string) => {
+    onSetHighlight: (color: string | null = "") => {
       if (editorMethods) {
-        editorMethods.addHighlight(color);
+        editorMethods.addHighlight(color || "");
       }
     },
     onUndo: () => {

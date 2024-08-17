@@ -86,8 +86,13 @@ export default function Editor({
         alignRight: () => editor.chain().focus().setTextAlign("right").run(),
         addColor: (color: string) =>
           editor.chain().focus().setColor(color).run(),
-        addHighlight: (color: string) =>
-          editor.chain().focus().setHighlight({ color }).run(),
+        addHighlight: (color: string | null) => {
+          if (color === null) {
+            editor.chain().focus().unsetHighlight().run();
+          } else {
+            editor.chain().focus().setHighlight({ color }).run();
+          }
+        },
         undoAction: () => editor.chain().focus().undo().run(),
         redoAction: () => editor.chain().focus().redo().run(),
       };

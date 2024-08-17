@@ -8,8 +8,8 @@ export interface ToolbarProp {
   onInsertTable: () => void;
   onInsertImage: (url: string) => void;
   onInsertLink: (url: string) => void;
-  onSetColor: (color: string) => void;
-  onSetHighlight: (color: string) => void;
+  onSetColor: (color: string | null) => void;
+  onSetHighlight: (color: string | null) => void;
   onUndo: () => void;
   onRedo: () => void;
 }
