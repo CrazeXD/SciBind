@@ -16,6 +16,8 @@ from rest_framework import viewsets
 from .models import BinderModel, EventModel, User
 from .serializers import BinderSerializer, EventSerializer
 
+import json
+
 
 def get_user(request):
     if "Authorization" not in request.headers:
@@ -40,7 +42,7 @@ class Binders(viewsets.ModelViewSet):
     model = BinderModel
     serializer_class = BinderSerializer
     queryset = BinderModel.objects.all()
-    
+
     def retrieve(self, request, pk=None):
         user = get_user(request)
         if user is None:
@@ -90,6 +92,16 @@ class Binders(viewsets.ModelViewSet):
                 {"error": "You don't have permission to edit this binder"},
                 status=status.HTTP_403_FORBIDDEN,
             )
+
+        if content := request.data.get("content"):
+            try:
+                json_content = json.loads(content)
+                request.data["content"] = json.dumps(json_content)
+            except json.JSONDecodeError:
+                return Response(
+                    {"error": "Invalid JSON content"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
         serializer = self.get_serializer(instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
