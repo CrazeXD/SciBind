@@ -138,5 +138,3 @@ AUTH_TOKEN_VALIDITY = 3600
 MEDIA_ROOT = BASE_DIR / "media"
 
 default_app_config = "app.apps.AppConfig"
-
-CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}

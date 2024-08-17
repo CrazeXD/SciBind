@@ -6,26 +6,8 @@ from SciBind.settings import MEDIA_ROOT
 
 import os
 import random
-import uuid
 
 # Create your models here.
-
-
-class DocumentField(models.Field):
-    description = "A document field that can be added to a binder"
-
-    def __init__(self, document, *args, **kwargs):
-        self.document = document
-        super().__init__(*args, **kwargs)
-
-    def db_type(self, connection):
-        return "document"
-
-    def deconstruct(self):
-        name, path, args, kwargs = super().deconstruct()
-        kwargs["document"] = self.document
-        return name, path, args, kwargs
-
 
 class User(AbstractUser):
     chosen_events = models.ManyToManyField("EventModel", related_name="owners")
@@ -82,7 +64,7 @@ class BinderModel(models.Model):
     materialtype = models.CharField(
         max_length=100, choices=EventModel.materialchoices, blank=True
     )
-    document = DocumentField(document="document", blank=True)
+    content = models.TextField(blank=True)
     division = models.CharField(max_length=1, choices=EventModel.divchoices, blank=True)
     old = models.BooleanField(default=False)
     online_users = models.ManyToManyField(User, related_name="online_binders")
