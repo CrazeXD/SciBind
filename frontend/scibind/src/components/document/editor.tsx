@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Typography from "@tiptap/extension-typography";
@@ -10,85 +10,47 @@ import TableHeader from "@tiptap/extension-table-header";
 import TableCell from "@tiptap/extension-table-cell";
 import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
-import Collaboration from "@tiptap/extension-collaboration";
-import CollaborationCursor from "@tiptap/extension-collaboration-cursor";
-import { WebsocketProvider } from "y-websocket";
 import { EditorMethods } from "@/libs/editormethods";
-import * as Y from "yjs";
 
 const PAGE_HEIGHT = 1056; // A4 height in pixels at 96 DPI
 const PAGE_WIDTH = 816; // A4 width in pixels at 96 DPI
 
 interface EditorProps {
-  slug: string;
   onEditorReady: (methods: EditorMethods) => void;
+  initialContent: string;
 }
 
-export default function Editor({ slug, onEditorReady }: EditorProps) {
-  const [ydoc, setYdoc] = useState<Y.Doc | null>(null);
-  const [provider, setProvider] = useState<WebsocketProvider | null>(null);
-
-  useEffect(() => {
-    const doc = new Y.Doc();
-    const wsProvider = new WebsocketProvider(
-      `ws://${window.location.host}/ws/${slug}/`,
-      slug,
-      doc
-    );
-    setYdoc(doc);
-    setProvider(wsProvider);
-    return () => {
-      wsProvider.destroy();
-      doc.destroy();
-    };
-  }, [slug]);
-
-  const editor = useEditor(
-    {
-      extensions: [
-        StarterKit.configure({
-          history: false,
-        }),      
-        Typography,
-        Underline,
-        TextAlign.configure({
-          types: ['heading', 'paragraph'],
-        }),
-        Table.configure({
-          resizable: true,
-        }),
-        TableRow,
-        TableHeader,
-        TableCell,
-        Image,
-        Link.configure({
-          openOnClick: false,
-        }),
-        ...(ydoc && provider
-          ? [
-              Collaboration.configure({
-                document: ydoc,
-              }),
-              CollaborationCursor.configure({
-                provider: provider,
-              }),
-            ]
-          : []),
-      ],
-      content: "<p>Start typing your document here...</p>",
-      editorProps: {
-        attributes: {
-          class:
-            "w-full p-8 bg-base-100 rounded shadow-md border border-gray-300 outline-none prose prose-sm sm:prose lg:prose-lg xl:prose-xl",
-          style: `min-height: ${PAGE_HEIGHT}px; color: black;`,
-        },
-      },
-      onUpdate: ({ editor }) => {
-        // Save content logic here
+export default function Editor({ onEditorReady, initialContent }: EditorProps) {
+  const editor = useEditor({
+    extensions: [
+      StarterKit.configure({
+        history: false,
+      }),
+      Typography,
+      Underline,
+      TextAlign.configure({
+        types: ["heading", "paragraph"],
+      }),
+      Table.configure({
+        resizable: true,
+      }),
+      TableRow,
+      TableHeader,
+      TableCell,
+      Image,
+      Link.configure({
+        openOnClick: false,
+      }),
+    ],
+    content: "<h1>Start typing your document here...</h1>",
+    editorProps: {
+      attributes: {
+        class:
+          "w-full p-8 bg-base-100 rounded shadow-md border border-gray-300 outline-none prose prose-sm sm:prose lg:prose-lg xl:prose-xl",
+        style: `min-height: ${PAGE_HEIGHT}px; color: black;`,
       },
     },
-    [ydoc, provider]
-  );
+  });
 
   useEffect(() => {
     if (editor) {
@@ -96,9 +58,16 @@ export default function Editor({ slug, onEditorReady }: EditorProps) {
         toggleBold: () => editor.chain().focus().toggleBold().run(),
         toggleItalic: () => editor.chain().focus().toggleItalic().run(),
         toggleUnderline: () => editor.chain().focus().toggleUnderline().run(),
-        insertTable: () => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run(),
-        insertImage: (url: string) => editor.chain().focus().setImage({ src: url }).run(),
-        insertLink: (url: string) => editor.chain().focus().setLink({ href: url }).run(),
+        insertTable: () =>
+          editor
+            .chain()
+            .focus()
+            .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
+            .run(),
+        insertImage: (url: string) =>
+          editor.chain().focus().setImage({ src: url }).run(),
+        insertLink: (url: string) =>
+          editor.chain().focus().setLink({ href: url }).run(),
         alignLeft: () => editor.chain().focus().setTextAlign("left").run(),
         alignCenter: () => editor.chain().focus().setTextAlign("center").run(),
         alignRight: () => editor.chain().focus().setTextAlign("right").run(),
@@ -106,6 +75,17 @@ export default function Editor({ slug, onEditorReady }: EditorProps) {
       onEditorReady(methods);
     }
   }, [editor, onEditorReady]);
+
+  useEffect(() => {
+    if (editor && initialContent) {
+      try {
+        editor.commands.setContent(JSON.parse(initialContent));
+      } catch (error) {
+        console.error("Failed to parse initialContent:", error);
+        editor.commands.setContent("<p>Start typing your document here...</p>");
+      }
+    }
+  }, [editor, initialContent]);
 
   return (
     <div className="flex-grow bg-base-200 p-4 overflow-auto">

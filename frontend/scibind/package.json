@@ -11,6 +11,8 @@
   "dependencies": {
     "@fortawesome/free-solid-svg-icons": "^6.6.0",
     "@fortawesome/react-fontawesome": "^0.2.2",
+    "@hocuspocus/extension-database": "^2.13.5",
+    "@hocuspocus/server": "^2.13.5",
     "@syncedstore/core": "^0.6.0",
     "@tiptap/extension-collaboration": "^2.5.7",
     "@tiptap/extension-collaboration-cursor": "^2.5.7",
@@ -28,10 +30,12 @@
     "@tiptap/starter-kit": "^2.5.7",
     "@types/react-color": "^3.0.12",
     "axios": "^1.7.4",
+    "debounce": "^2.1.0",
     "next": "14.2.5",
     "react": "^18",
     "react-color": "^2.19.3",
     "react-dom": "^18",
+    "sqlite3": "^5.1.7",
     "y-websocket": "^2.0.4",
     "yjs": "^13.6.18"
   },
