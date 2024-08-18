@@ -9,6 +9,7 @@ import random
 
 # Create your models here.
 
+
 class User(AbstractUser):
     chosen_events = models.ManyToManyField("EventModel", related_name="owners")
     profile_picture = models.ImageField(
@@ -66,7 +67,10 @@ class BinderModel(models.Model):
     )
     content = models.JSONField(blank=True, null=True)
     old = models.BooleanField(default=False)
-    online_users = models.ManyToManyField(User, related_name="online_binders", blank=True, null=True)
+    online_users = models.ManyToManyField(
+        User, related_name="online_binders", blank=True, null=True
+    )
+
     def save(self, *args, **kwargs):
         if self.event:
             self.materialtype = self.event.materialtype

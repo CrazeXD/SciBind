@@ -1,0 +1,16 @@
+[tool.black]
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.__pycache__
+  | \.env
+  | build
+  | dist
+  | migrations
+)/
+'''
+include = 'backend/SciBind/.*\.pyi?$'
+line-length = 88
+version = ['py312']

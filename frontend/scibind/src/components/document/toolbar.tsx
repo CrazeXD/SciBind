@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { fas } from "@fortawesome/free-solid-svg-icons";
-import CustomColorPicker from "@/components/ColorPicker";
+import CustomColorPicker from "@/components/document/ColorPicker";
 import { ToolbarProp } from "@/libs/toolbarprop";
 
 interface ToolbarProps {

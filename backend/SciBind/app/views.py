@@ -244,9 +244,9 @@ def profile_picture(request):
         file_path = os.path.join(settings.MEDIA_ROOT, str(user.profile_picture))
         if os.path.exists(file_path):
             response = FileResponse(open(file_path, "rb"))
-            response["Content-Disposition"] = (
-                f"inline; filename={os.path.basename(file_path)}"
-            )
+            response[
+                "Content-Disposition"
+            ] = f"inline; filename={os.path.basename(file_path)}"
             return response
     return Response(
         {"error": "Profile picture not found"}, status=status.HTTP_404_NOT_FOUND

@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import BinderModel, EventModel
 
+
 class BinderSerializer(serializers.ModelSerializer):
     event = serializers.CharField(source="event.name")
     content = serializers.JSONField(required=False)
