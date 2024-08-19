@@ -8,8 +8,9 @@ media/ - Contains media files used by the server (e.g. profile pictures). User f
 
 To run the server, first make and apply migrations.
 
-py manage.py makemigrations
-py manage.py migrate
+`py manage.py makemigrations`
+
+`py manage.py migrate`
 
 Then, run the server
-py manage.py runserver
+`py manage.py runserver`
