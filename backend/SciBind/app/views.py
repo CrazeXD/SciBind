@@ -129,10 +129,20 @@ class Events(viewsets.ModelViewSet):
         serializer = EventSerializer(queryset, many=True)
         return Response(serializer.data)
 
+    def retrieve(self, request, pk=None):
+        # Get the user
+        user = get_user(request)
+        if user is None:
+            return Response(
+                {"error": "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED
+            )
+        # Get the event
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
 
 # User views
-
-
 @csrf_exempt
 @api_view(["POST"])
 @permission_classes([permissions.AllowAny])

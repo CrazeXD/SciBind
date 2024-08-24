@@ -36,16 +36,20 @@ def set_random_profile_picture(sender, instance, created, **kwargs):
 class EventModel(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
-    # materialtype can either be 'binder', 'cheat sheet', or 'none'
+    # materialtype can either be 'binder', 'cheat sheet', or 'none'\
     materialchoices = [
-        ("binder", "Binder"),
-        ("cheat sheet", "Cheat Sheet"),
+        ("Binder", "Binder"),
+        ("Cheatsheet", "Cheat Sheet"),
         ("none", "None"),
     ]
     materialtype = models.CharField(max_length=100, choices=materialchoices)
     divchoices = ("a", "b", "c")
     divchoices = [(x, x) for x in divchoices]
     division = models.CharField(max_length=1, choices=divchoices)
+
+    display_image = models.ImageField(
+        upload_to="event_images", default="event_images/default.png"
+    )
     # Check if there are objects of this instance
 
     def __str__(self):
@@ -68,7 +72,7 @@ class BinderModel(models.Model):
     content = models.JSONField(blank=True, null=True)
     old = models.BooleanField(default=False)
     online_users = models.ManyToManyField(
-        User, related_name="online_binders", blank=True, null=True
+        User, related_name="online_binders", blank=True
     )
 
     def save(self, *args, **kwargs):
