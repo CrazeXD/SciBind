@@ -40,7 +40,10 @@ class EventTest(TestCase):
             # sourcery skip: no-loop-in-tests
             for row in reader:
                 event = EventModel.objects.get_or_create(
-                    name=row[0], materialtype=row[1], division=row[2]
+                    name=row[0],
+                    materialtype=row[1],
+                    division=row[2],
+                    display_image=row[3],
                 )
                 self.assertTrue(event)
 
