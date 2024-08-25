@@ -4,6 +4,7 @@ from .models import BinderModel, EventModel
 
 class BinderSerializer(serializers.ModelSerializer):
     event = serializers.CharField(source="event.name")
+    division = serializers.CharField(source="event.division")
     content = serializers.JSONField(required=False)
 
     class Meta:
@@ -17,6 +18,7 @@ class BinderSerializer(serializers.ModelSerializer):
             "content",
             "old",
             "online_users",
+            "division",
         ]
 
 

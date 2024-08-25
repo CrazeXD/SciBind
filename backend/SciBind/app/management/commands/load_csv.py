@@ -1,4 +1,5 @@
 import csv
+from tkinter import E
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from app.models import EventModel
@@ -12,7 +13,11 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         if EventModel.objects.exists():
-            self.stdout.write(self.style.SUCCESS("Events already loaded"))
+            self.stdout.write(
+                self.style.WARNING("Events already loaded. Dumping all events...")
+            )
+            EventModel.objects.all().delete()
+            self.stdout.write(self.style.SUCCESS("Events dumped successfully."))
         with open(kwargs["csv_file"], "r") as f:
             reader = csv.DictReader(f)
             with transaction.atomic():

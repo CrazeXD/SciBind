@@ -18,6 +18,7 @@ const EventSelector: React.FC = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [selectedEvents, setSelectedEvents] = useState<Event[]>([]);
   const [token, setToken] = useState<string>("");
+  const [activeDivision, setActiveDivision] = useState<string>("");
   const router = useRouter();
 
   const fetchData = useCallback(async (endpoint: string) => {
@@ -41,7 +42,12 @@ const EventSelector: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    fetchData("/events/").then(setEvents);
+    fetchData("/events/").then((fetchedEvents) => {
+      setEvents(fetchedEvents);
+      if (fetchedEvents.length > 0) {
+        setActiveDivision(fetchedEvents[0].division);
+      }
+    });
     fetchData("/user-events/").then(setSelectedEvents);
   }, [fetchData]);
 
@@ -69,7 +75,9 @@ const EventSelector: React.FC = () => {
         }),
       });
 
-      if (!response.ok) throw new Error("Failed to submit events");
+      if (!response.ok) {
+        throw new Error("Failed to submit events");
+      }
       router.push("/dashboard");
     } catch (error) {
       console.error("Error submitting events:", error);
@@ -81,10 +89,12 @@ const EventSelector: React.FC = () => {
     return acc;
   }, {} as GroupedEvents);
 
+  const divisions = Object.keys(groupedEvents);
+
   return (
-    <div className="min-h-screen bg-neutral p-6">
-      <div className="container mx-auto">
-        <h1 className="text-4xl font-bold mt-10 mb-8 text-center text-secondary">
+    <div className="min-h-screen bg-base-200 p-6">
+      <div className="container mx-auto max-w-4xl">
+        <h1 className="text-4xl font-bold mt-10 mb-8 text-center text-primary">
           Select Your Events
         </h1>
 
@@ -95,13 +105,24 @@ const EventSelector: React.FC = () => {
           onClearAll={handleClearAll}
         />
 
+        <div className="grid gap-8 mb-8">
+          <div className="card bg-base-100 shadow-xl">
+            <div className="card-body">
+              <DivisionTabs
+                divisions={divisions}
+                activeDivision={activeDivision}
+                setActiveDivision={setActiveDivision}
+              />
         <EventList
-          groupedEvents={groupedEvents}
+                events={groupedEvents[activeDivision] || []}
           selectedEvents={selectedEvents}
           onEventSelect={handleEventSelect}
         />
+            </div>
+          </div>
 
         <SelectedEventsList selectedEvents={selectedEvents} />
+        </div>
 
         <SubmitButton
           onSubmit={handleSubmit}
@@ -112,46 +133,62 @@ const EventSelector: React.FC = () => {
   );
 };
 
+const DivisionTabs: React.FC<{
+  divisions: string[];
+  activeDivision: string;
+  setActiveDivision: (division: string) => void;
+}> = ({ divisions, activeDivision, setActiveDivision }) => (
+  <div className="tabs tabs-boxed mb-4">
+    {divisions.map((division) => (
+      <a
+        key={division}
+        className={`tab ${activeDivision === division ? 'tab-active' : ''}`}
+        onClick={() => setActiveDivision(division)}
+      >
+        Division {division}
+      </a>
+    ))}
+  </div>
+);
+
 const EventSelectionControls: React.FC<{
   selectedCount: number;
   totalCount: number;
   onSelectAll: () => void;
   onClearAll: () => void;
 }> = ({ selectedCount, totalCount, onSelectAll, onClearAll }) => (
-  <div className="mb-6 flex justify-between items-center">
-    <p className="text-secondary">
+  <div className="card bg-base-100 shadow-xl mb-8">
+    <div className="card-body">
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+        <p className="text-secondary font-semibold">
       Selected Events: {selectedCount} / {totalCount}
     </p>
-    <div>
+        <div className="flex gap-2">
       <button
-        className="btn btn-secondary mr-2 hover:bg-accent hover:text-white"
+            className="btn btn-primary btn-sm"
         onClick={onSelectAll}
       >
-        Select All Events
+            Select All
       </button>
       <button
-        className="btn btn-secondary hover:bg-accent hover:text-white"
+            className="btn btn-ghost btn-sm"
         onClick={onClearAll}
       >
-        Clear All Selections
+            Clear All
       </button>
+        </div>
+      </div>
     </div>
   </div>
 );
 
 const EventList: React.FC<{
-  groupedEvents: GroupedEvents;
+  events: Event[];
   selectedEvents: Event[];
   onEventSelect: (event: Event) => void;
-}> = ({ groupedEvents, selectedEvents, onEventSelect }) => (
-  <>
-    {Object.entries(groupedEvents).map(([division, divisionEvents]) => (
-      <div key={division} className="mb-8">
-        <h3 className="text-2xl font-semibold mb-4 text-accent">
-          Div {division}
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {divisionEvents.map((event) => (
+}> = ({ events, selectedEvents, onEventSelect }) => (
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+    {events.map((event) => (
             <EventButton
               key={event.id}
               event={event}
@@ -160,9 +197,6 @@ const EventList: React.FC<{
             />
           ))}
         </div>
-      </div>
-    ))}
-  </>
 );
 
 const EventButton: React.FC<{
@@ -171,9 +205,9 @@ const EventButton: React.FC<{
   onSelect: () => void;
 }> = ({ event, isSelected, onSelect }) => (
   <button
-    className={`btn no-animation btn-lg ${
-      isSelected ? "bg-primary text-white" : "btn-outline btn-secondary"
-    } transition-all duration-300 hover:scale-105 hover:bg-accent hover:text-white`}
+    className={`btn btn-sm w-full ${
+      isSelected ? "btn-primary" : "btn-outline btn-secondary"
+    } transition-all duration-300 hover:scale-105`}
     onClick={onSelect}
   >
     {event.name}
@@ -183,9 +217,10 @@ const EventButton: React.FC<{
 const SelectedEventsList: React.FC<{ selectedEvents: Event[] }> = ({
   selectedEvents,
 }) => (
-  <div className="bg-base-100 rounded-lg shadow-lg p-6 mb-8">
-    <h2 className="text-2xl font-semibold mb-4 text-accent">
-      Selected Events:
+  <div className="card bg-base-100 shadow-xl">
+    <div className="card-body">
+      <h2 className="card-title text-accent mb-4">
+        Selected Events
     </h2>
     {selectedEvents.length > 0 ? (
       <ul className="space-y-2">
@@ -199,6 +234,7 @@ const SelectedEventsList: React.FC<{ selectedEvents: Event[] }> = ({
     ) : (
       <p className="text-secondary opacity-70">No events selected yet.</p>
     )}
+    </div>
   </div>
 );
 

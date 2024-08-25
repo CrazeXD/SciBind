@@ -42,7 +42,7 @@ class EventModel(models.Model):
         ("none", "None"),
     ]
     materialtype = models.CharField(max_length=100, choices=materialchoices)
-    divchoices = ("a", "b", "c")
+    divchoices = ("A", "B", "C")
     divchoices = [(x, x) for x in divchoices]
     division = models.CharField(max_length=1, choices=divchoices)
     display_image = models.CharField(max_length=100, blank=True, null=True)
