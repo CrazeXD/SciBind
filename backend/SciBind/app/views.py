@@ -119,7 +119,6 @@ def get_binder_image(request, pk):
     try:
         binder = BinderModel.objects.get(id=pk)
     except BinderModel.DoesNotExist:
-        print("Binder not found")
         return HttpResponse("Binder not found", status=status.HTTP_404_NOT_FOUND)
     if binder.old:
         return HttpResponse(
@@ -132,7 +131,6 @@ def get_binder_image(request, pk):
         )
     event = binder.event
     file_path = event.display_image
-    print(file_path)
     if os.path.exists(file_path):
         response = FileResponse(open(file_path, "rb"))
         response[

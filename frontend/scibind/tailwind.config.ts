@@ -1,14 +1,14 @@
 import type { Config } from 'tailwindcss';
 
 const main_colors = {
-  primary: '#3b82f6',
-  secondary: '#94a3b8',
-  accent: '#5f73c3',
-  neutral: '#1e293b',
-  'base-100': '#0f172a',
-  info: '#38bdf8',
-  success: '#4ade80',
-  warning: '#facc15',
+  primary: '#4f46e5',
+  secondary: '#64748b',
+  accent: '#8b5cf6',
+  neutral: '#334155',
+  'base-100': '#1e293b',
+  info: '#0ea5e9',
+  success: '#10b981',
+  warning: '#f59e0b',
   error: '#ef4444',
 };
 
