@@ -12,18 +12,17 @@ import random
 
 class User(AbstractUser):
     chosen_events = models.ManyToManyField("EventModel", related_name="owners")
-    profile_picture = models.ImageField(
-        upload_to="profile_pictures", default="profile_pictures/default.png"
-    )
+    profile_picture = models.ImageField()
 
 
 def get_random_profile_picture():
-    template_dir = os.path.join(MEDIA_ROOT, "profile_pictures", "templates")
+    template_dir = os.path.join("lib", "images", "profile_pictures")
     if templates := [
         f for f in os.listdir(template_dir) if f.endswith((".png", ".jpg", ".jpeg"))
     ]:
-        return os.path.join("profile_pictures", "templates", random.choice(templates))
-    return "profile_pictures/default.png"
+        return os.path.join(
+            "lib", "images", "profile_pictures", random.choice(templates)
+        )
 
 
 @receiver(post_save, sender=User)
@@ -46,15 +45,12 @@ class EventModel(models.Model):
     divchoices = ("a", "b", "c")
     divchoices = [(x, x) for x in divchoices]
     division = models.CharField(max_length=1, choices=divchoices)
-
-    display_image = models.ImageField(
-        upload_to="event_images", default="event_images/default.png"
-    )
-    # Check if there are objects of this instance
+    display_image = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
         return self.name
 
+    # Check if there are objects of this instance
     def has_objects(self):
         return self.bindermodel_set.exists()
 

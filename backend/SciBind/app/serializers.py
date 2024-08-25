@@ -8,10 +8,19 @@ class BinderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BinderModel
-        fields = "__all__"
+        fields = [
+            "id",
+            "event",
+            "date",
+            "shared_with",
+            "materialtype",
+            "content",
+            "old",
+            "online_users",
+        ]
 
 
 class EventSerializer(serializers.ModelSerializer):
     class Meta:
         model = EventModel
-        fields = ["id", "name", "division", "materialtype", "display_image"]
+        fields = ["id", "name", "division", "materialtype"]

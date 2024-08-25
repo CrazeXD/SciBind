@@ -1,8 +1,10 @@
 import os
+import re
 
 from django.conf import settings
 from django.contrib.auth import authenticate
-from django.http import FileResponse
+from django.http import FileResponse, HttpResponse
+from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 
 from django.db.models import Q
@@ -107,6 +109,38 @@ class Binders(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
         return Response(serializer.data)
+
+
+# Binder Card Component Event Image
+def get_binder_image(request, pk):
+    user = get_user(request)
+    if user is None:
+        return HttpResponse("Invalid token", status=status.HTTP_400_BAD_REQUEST)
+    try:
+        binder = BinderModel.objects.get(id=pk)
+    except BinderModel.DoesNotExist:
+        print("Binder not found")
+        return HttpResponse("Binder not found", status=status.HTTP_404_NOT_FOUND)
+    if binder.old:
+        return HttpResponse(
+            "Binder has been archived", status=status.HTTP_404_NOT_FOUND
+        )
+    elif binder.owner != user and user not in binder.shared_with.all():
+        return HttpResponse(
+            "You don't have permission to view this binder",
+            status=status.HTTP_403_FORBIDDEN,
+        )
+    event = binder.event
+    file_path = event.display_image
+    print(file_path)
+    if os.path.exists(file_path):
+        response = FileResponse(open(file_path, "rb"))
+        response[
+            "Content-Disposition"
+        ] = f"inline; filename={os.path.basename(file_path)}"
+        return response
+    else:
+        return HttpResponse("Image not found", status=status.HTTP_404_NOT_FOUND)
 
 
 class Events(viewsets.ModelViewSet):
@@ -251,7 +285,7 @@ def profile_picture(request):
     if user is None:
         return Response({"error": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
     if user.profile_picture:
-        file_path = os.path.join(settings.MEDIA_ROOT, str(user.profile_picture))
+        file_path = os.path.join(str(user.profile_picture))
         if os.path.exists(file_path):
             response = FileResponse(open(file_path, "rb"))
             response[

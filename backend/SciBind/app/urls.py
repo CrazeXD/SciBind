@@ -10,6 +10,7 @@ from .views import (
     validate_token,
     set_events,
     get_events,
+    get_binder_image,
 )
 
 
@@ -27,4 +28,5 @@ urlpatterns = [
     path("verify/", validate_token),
     path("event-set/", set_events),
     path("user-events/", get_events),
+    path("get_binder_image/<int:pk>/", get_binder_image),
 ]

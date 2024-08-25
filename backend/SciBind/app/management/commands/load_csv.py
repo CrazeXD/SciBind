@@ -27,6 +27,6 @@ class Command(BaseCommand):
                         name=name,
                         materialtype=materialtype,
                         division=division,
-                        display_image=f"event_images/{image_name}",
+                        display_image=f"lib/images/event_images/{image_name}",
                     )
         self.stdout.write(self.style.SUCCESS("Events loaded successfully"))
