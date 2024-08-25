@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useRouter } from "next/navigation";
-import React, { useState, useEffect, useCallback } from "react";
+import { useRouter } from 'next/navigation';
+import React, { useState, useEffect, useCallback } from 'react';
 
 interface Event {
   id: number;
@@ -14,18 +14,18 @@ interface Event {
 
 type GroupedEvents = Record<string, Event[]>;
 
-const API_BASE_URL = "http://127.0.0.1:8000/api";
+const API_BASE_URL = 'http://127.0.0.1:8000/api';
 
 const EventSelector: React.FC = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [selectedEvents, setSelectedEvents] = useState<Event[]>([]);
-  const [token, setToken] = useState<string>("");
-  const [activeDivision, setActiveDivision] = useState<string>("");
+  const [token, setToken] = useState<string>('');
+  const [activeDivision, setActiveDivision] = useState<string>('');
   const [hoveredEvent, setHoveredEvent] = useState<Event | null>(null);
   const router = useRouter();
 
   const fetchData = useCallback(async (endpoint: string) => {
-    const storedToken = localStorage.getItem("token");
+    const storedToken = localStorage.getItem('token');
     if (storedToken) {
       setToken(storedToken);
     }
@@ -45,13 +45,13 @@ const EventSelector: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    fetchData("/events/").then((fetchedEvents) => {
+    fetchData('/events/').then((fetchedEvents) => {
       setEvents(fetchedEvents);
       if (fetchedEvents.length > 0) {
         setActiveDivision(fetchedEvents[0].division);
       }
     });
-    fetchData("/user-events/").then(setSelectedEvents);
+    fetchData('/user-events/').then(setSelectedEvents);
   }, [fetchData]);
 
   const handleEventSelect = useCallback((event: Event) => {
@@ -73,9 +73,9 @@ const EventSelector: React.FC = () => {
   const handleSubmit = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/event-set/`, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
           Authorization: `Token ${token}`,
         },
         body: JSON.stringify({
@@ -84,11 +84,11 @@ const EventSelector: React.FC = () => {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to submit events");
+        throw new Error('Failed to submit events');
       }
-      router.push("/dashboard");
+      router.push('/dashboard');
     } catch (error) {
-      console.error("Error submitting events:", error);
+      console.error('Error submitting events:', error);
     }
   };
 
@@ -159,7 +159,7 @@ const DivisionTabs: React.FC<{
     {divisions.map((division) => (
       <a
         key={division}
-        className={`tab ${activeDivision === division ? "tab-active" : ""}`}
+        className={`tab ${activeDivision === division ? 'tab-active' : ''}`}
         onClick={() => setActiveDivision(division)}
       >
         Division {division}
@@ -220,7 +220,7 @@ const EventButton: React.FC<{
 }> = ({ event, isSelected, onSelect, onHover }) => (
   <button
     className={`btn btn-sm w-full ${
-      isSelected ? "btn-primary" : "btn-outline btn-secondary"
+      isSelected ? 'btn-primary' : 'btn-outline btn-secondary'
     } transition-all duration-300 hover:scale-105`}
     onClick={onSelect}
     onMouseEnter={() => onHover(event)}

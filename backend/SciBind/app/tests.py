@@ -24,7 +24,7 @@ class UserCreationTest(TestCase):
         self.assertFalse(user.is_superuser)
         self.assertTrue(user.is_active)
         profile_picture = user.profile_picture
-        path = "media/profile_pictures/templates/"
+        path = "lib/images/profile_pictures/"
         self.assertIn(profile_picture.url.rsplit("/")[-1], os.listdir(path))
 
 
