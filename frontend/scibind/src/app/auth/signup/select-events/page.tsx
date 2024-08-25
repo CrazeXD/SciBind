@@ -8,6 +8,8 @@ interface Event {
   name: string;
   division: string;
   materialtype: string;
+  description: string;
+  category: string;
 }
 
 type GroupedEvents = Record<string, Event[]>;
@@ -261,6 +263,12 @@ const EventDetailsSidebar: React.FC<{ hoveredEvent: Event | null }> = ({ hovered
             </p>
             <p>
               <strong>Material Type:</strong> {displayedEvent.materialtype}
+            </p>
+            <p>
+              <strong>Category:</strong> {displayedEvent.category}
+            </p>
+            <p>
+              <strong>Description:</strong> {displayedEvent.description}
             </p>
           </div>
         ) : (

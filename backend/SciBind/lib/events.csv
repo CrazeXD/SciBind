@@ -1,15 +1,15 @@
-Name,Material Type,Division,Image Name
-Anatomy and Physiology,Cheatsheet,B,science.png
-Crime Busters,Cheatsheet,B,science.png
-Disease Detectives,Cheatsheet,B,science.png
-Dynamic Planet,Binder,B,science.png
-Ecology,Cheatsheet,B,science.png
-Forestry,Binder,B,science.png
-Fossils,Binder,B,science.png
-Meteorology,Binder,B,science.png
-Microbe Mission,Cheatsheet,B,science.png
-Optics,Binder,B,science.png
-Reach for the Stars,Cheatsheet,B,science.png
-Road Scholar,Binder,B,science.png
-Wind Power,Binder,B,science.png
-Wind Power,Binder,C,science.png
+Name,Material Type,Division,Image Name,Description,Category
+Anatomy and Physiology,Cheatsheet,B,science.png,Anatomy and Physiology,Biology
+Crime Busters,Cheatsheet,B,science.png,Crime Busters,Chemistry
+Disease Detectives,Cheatsheet,B,science.png,Disease Detectives,Biology
+Dynamic Planet,Binder,B,science.png,Dynamic Planet,Earth Science
+Ecology,Cheatsheet,B,science.png,Ecology,Biology
+Forestry,Binder,B,science.png,Forestry,Earth Science
+Fossils,Binder,B,science.png,Fossils,Earth Science
+Meteorology,Binder,B,science.png,Meteorology,Earth Science
+Microbe Mission,Cheatsheet,B,science.png,Microbe Mission,Biology
+Optics,Binder,B,science.png,Optics,Physics
+Reach for the Stars,Cheatsheet,B,science.png,Reach for the Stars,Astronomy
+Road Scholar,Binder,B,science.png,Road Scholar,Miscellaneous
+Wind Power,Binder,B,science.png,Wind Power,Physics
+Wind Power,Binder,C,science.png,Wind Power,Physics

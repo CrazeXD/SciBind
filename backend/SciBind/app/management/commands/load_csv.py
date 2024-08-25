@@ -22,16 +22,20 @@ class Command(BaseCommand):
             reader = csv.DictReader(f)
             with transaction.atomic():
                 for row in reader:
-                    name, materialtype, division, image_name = (
+                    name, materialtype, division, image_name, description, category = (
                         row["Name"],
                         row["Material Type"],
                         row["Division"],
                         row["Image Name"],
+                        row["Description"],
+                        row["Category"],
                     )
                     EventModel.objects.create(
                         name=name,
                         materialtype=materialtype,
                         division=division,
                         display_image=f"lib/images/event_images/{image_name}",
+                        description=description,
+                        category=category,
                     )
         self.stdout.write(self.style.SUCCESS("Events loaded successfully"))
