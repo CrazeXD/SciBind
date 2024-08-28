@@ -47,8 +47,6 @@ class EventTest(TestCase):
                 )
                 self.assertTrue(event)
 
-
-class EventSelectionTest(TestCase):
     def test_event_selection(self):
         # Create a user
         user = User.objects.create_user(username="test_user", password="test_password")
