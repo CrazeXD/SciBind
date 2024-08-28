@@ -3,8 +3,7 @@ import re
 
 from django.conf import settings
 from django.contrib.auth import authenticate
-from django.http import FileResponse, HttpResponse
-from django.shortcuts import get_object_or_404
+from django.http import FileResponse, HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from django.db.models import Q
@@ -44,21 +43,6 @@ class Binders(viewsets.ModelViewSet):
     model = BinderModel
     serializer_class = BinderSerializer
     queryset = BinderModel.objects.all()
-
-    def retrieve(self, request, pk=None):
-        user = get_user(request)
-        if user is None:
-            return Response(
-                {"error": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST
-            )
-        instance = self.get_object()
-        if instance.owner != user and user not in instance.shared_with.all():
-            return Response(
-                {"error": "You don't have permission to view this binder"},
-                status=status.HTTP_403_FORBIDDEN,
-            )
-        serializer = self.get_serializer(instance)
-        return Response(serializer.data)
 
     def list(self, request):
         user = get_user(request)
@@ -131,6 +115,7 @@ def get_binder_image(request, pk):
         )
     event = binder.event
     file_path = event.display_image
+    file_path = os.path.join("lib", "images", "event_images", file_path)
     if os.path.exists(file_path):
         response = FileResponse(open(file_path, "rb"))
         response[
@@ -161,17 +146,34 @@ class Events(viewsets.ModelViewSet):
         serializer = EventSerializer(queryset, many=True)
         return Response(serializer.data)
 
-    def retrieve(self, request, pk=None):
-        # Get the user
-        user = get_user(request)
-        if user is None:
-            return Response(
-                {"error": "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED
-            )
-        # Get the event
-        instance = self.get_object()
-        serializer = self.get_serializer(instance)
-        return Response(serializer.data)
+
+# Event Info for Document Editor
+@csrf_exempt
+@api_view(["GET"])
+@permission_classes([permissions.IsAuthenticated])
+def get_event_info(request, pk: int):
+    user = get_user(request)
+    if user is None:
+        return HttpResponse("Invalid token", status=status.HTTP_400_BAD_REQUEST)
+    try:
+        binder = BinderModel.objects.get(id=pk)
+    except BinderModel.DoesNotExist:
+        return HttpResponse("Binder not found", status=status.HTTP_404_NOT_FOUND)
+    if user != binder.owner and user not in binder.shared_with.all():
+        return HttpResponse(
+            "You don't have permission to view this binder",
+            status=status.HTTP_403_FORBIDDEN,
+        )
+    event = binder.event
+    # TODO: Add rules for events
+    data = {
+        "name": event.name,
+        "division": event.division,
+        "materialtype": event.materialtype,
+        "description": event.description,
+        "category": event.category,
+    }
+    return JsonResponse(data)
 
 
 # User views

@@ -105,8 +105,7 @@ export default function Editor({
       try {
         editor.commands.setContent(JSON.parse(initialContent));
       } catch (error) {
-        console.error("Failed to parse initialContent:", error);
-        editor.commands.setContent("<p>Start typing your document here...</p>");
+        editor.commands.setContent("<p></p>");
       }
     }
   }, [editor, initialContent]);

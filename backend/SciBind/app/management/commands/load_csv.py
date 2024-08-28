@@ -11,12 +11,11 @@ class Command(BaseCommand):
         parser.add_argument("csv_file", type=str)
 
     def handle(self, *args, **kwargs):
-        MODIFY = input("Do you want to modify existing events? (y/n): ")
-        MODIFY = MODIFY.lower() == "y"
         if EventModel.objects.exists():
             self.stdout.write(
                 self.style.WARNING("Events already loaded. Modifying events...")
             )
+            MODIFY = True
             with open(kwargs["csv_file"], "r") as f:
                 reader = csv.DictReader(f)
                 with transaction.atomic():

@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Navbar from "@/components/navbar";
-import Binder from "@/components/binder";
+import Navbar from "@/components/dashboard/navbar";
+import Binder from "@/components/dashboard/binder";
 
 export default function Dashboard() {
   const router = useRouter();

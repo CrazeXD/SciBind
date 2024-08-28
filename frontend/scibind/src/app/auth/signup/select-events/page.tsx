@@ -2,6 +2,8 @@
 
 import { useRouter } from 'next/navigation';
 import React, { useState, useEffect, useCallback } from 'react';
+import { DivisionTabs } from "@/components/events/divisiontabs";
+import { EventSelectionControls } from "@/components/events/selectioncontrols";
 
 interface Event {
   id: number;
@@ -149,49 +151,6 @@ const EventSelector: React.FC = () => {
     </div>
   );
 };
-
-const DivisionTabs: React.FC<{
-  divisions: string[];
-  activeDivision: string;
-  setActiveDivision: (division: string) => void;
-}> = ({ divisions, activeDivision, setActiveDivision }) => (
-  <div className="tabs tabs-boxed mb-4">
-    {divisions.map((division) => (
-      <a
-        key={division}
-        className={`tab ${activeDivision === division ? 'tab-active' : ''}`}
-        onClick={() => setActiveDivision(division)}
-      >
-        Division {division}
-      </a>
-    ))}
-  </div>
-);
-
-const EventSelectionControls: React.FC<{
-  selectedCount: number;
-  totalCount: number;
-  onSelectAll: () => void;
-  onClearAll: () => void;
-}> = ({ selectedCount, totalCount, onSelectAll, onClearAll }) => (
-  <div className="card bg-base-100 shadow-xl mb-8">
-    <div className="card-body">
-      <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-        <p className="text-secondary font-semibold">
-          Selected Events: {selectedCount} / {totalCount}
-        </p>
-        <div className="flex gap-2">
-          <button className="btn btn-primary btn-sm" onClick={onSelectAll}>
-            Select All
-          </button>
-          <button className="btn btn-ghost btn-sm" onClick={onClearAll}>
-            Clear All
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-);
 
 const EventList: React.FC<{
   events: Event[];
